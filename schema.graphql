@@ -1,0 +1,41 @@
+type GroupData @entity {
+  id:          ID!
+  groupId:     Bytes!
+  groupAmount: Float!
+  pooledGas:   BigInt!
+}
+
+type UserData @entity {
+  id:       ID!
+  address:  Bytes!
+  groupIds: [Bytes!]!
+  amounts:  [Float!]!
+}
+
+type GroupExecuted @entity {
+  id:           ID!
+  groupId:      Bytes!
+  returnAmount: Float!
+  usedGas:      BigInt!
+}
+
+type WithdrawRequest @entity {
+  id:       ID!
+  address:  Bytes!
+  groupIds: [Bytes!]!
+  amounts:  [Float!]!
+}
+
+type WithdrawApproved @entity {
+  id:       ID!
+  address:  Bytes!
+  groupIds: [Bytes!]!
+  amounts:  [Float!]!
+}
+
+type WithdrawDeclined @entity {
+  id:       ID!
+  address:  Bytes!
+  groupIds: [Bytes!]!
+  amounts:  [Float!]!
+}
