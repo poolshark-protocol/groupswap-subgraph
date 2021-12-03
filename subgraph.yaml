@@ -8,8 +8,8 @@ dataSources:
     name: PredaDex
     network: rinkeby
     source:
-      address: '0x2E645469f354BB4F5c8a05B3b30A929361cf77eC'
-      abi: PredaDex
+      address: '0x67df0ca794467316ac8B951CAFa547B711E671Fc'
+      abi: GroupSwap
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
@@ -22,8 +22,8 @@ dataSources:
         - WithdrawApproved
         - WithdrawDeclined
       abis:
-        - name: PredaDex
-          file: ./abis/PredaDex.json
+        - name: GroupSwap
+          file: ./abis/GroupSwap.json
       eventHandlers:
         - event: DepositedToGroup(bytes32,address,uint192,uint64)
           handler: handleDepositedToGroup

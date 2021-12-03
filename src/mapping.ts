@@ -4,5 +4,6 @@ import { PredaDex } from '../generated/schema'
 export function handleDepostiedToGroup(event: DepositedToGroup): void {
   //set groupData
   let groupData = new GroupData(event.params.groupId.toHex())
+  
   //set userData
 }
