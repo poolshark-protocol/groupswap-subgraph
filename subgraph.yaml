@@ -31,9 +31,9 @@ dataSources:
           handler: handleWithdrawRequested
         - event: WithdrawDeclined(bytes32,address,address)
           handler: handleWithdrawDeclined
-        - event: WithdrawFromGroupPre(bytes32,address,uint256)
+        - event: WithdrawnFromGroupPre(bytes32,address,uint256)
           handler: handleWithdrawFromGroupPre
-        - event: WithdrawFromGroupPost(bytes32,address,uint256)
+        - event: WithdrawnFromGroupPost(bytes32,address,uint256)
           handler: handleWithdrawFromGroupPost
         - event: GroupExecuted(bytes32,uint256)
           handler: handleGroupExecuted
