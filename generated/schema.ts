@@ -90,7 +90,7 @@ export class UserData extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("groupMap", Value.fromString(""));
+    this.set("groupAmounts", Value.fromString(""));
   }
 
   save(): void {
@@ -119,13 +119,13 @@ export class UserData extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get groupMap(): string {
-    let value = this.get("groupMap");
+  get groupAmounts(): string {
+    let value = this.get("groupAmounts");
     return value!.toString();
   }
 
-  set groupMap(value: string) {
-    this.set("groupMap", Value.fromString(value));
+  set groupAmounts(value: string) {
+    this.set("groupAmounts", Value.fromString(value));
   }
 }
 

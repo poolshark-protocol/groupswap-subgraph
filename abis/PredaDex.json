@@ -14,25 +14,25 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "bytes32",
           "name": "groupId",
           "type": "bytes32"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "address",
           "name": "user",
           "type": "address"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "uint192",
           "name": "amount",
           "type": "uint192"
         },
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "uint64",
           "name": "userGas",
           "type": "uint64"

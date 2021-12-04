@@ -5,7 +5,7 @@
   "license": "BSD-3-Clause",
   "scripts": {
     "create": "graph create example --node https://api.thegraph.com/deploy/",
-    "create-local": "graph create example --node http://127.0.0.1:8020",
+    "create-local": "graph create example --node http://127.0.0.1:3001",
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy example --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
@@ -16,8 +16,11 @@
     "@graphprotocol/graph-ts": "^0.24.1"
   },
   "dependencies": {
+    "assemblyscript-json": "^1.1.0",
     "babel-polyfill": "^6.26.0",
     "babel-register": "^6.26.0",
+    "json-as": "^0.2.6",
+    "matchstick-as": "^0.2.0",
     "truffle": "^5.0.4",
     "truffle-contract": "^4.0.5",
     "truffle-hdwallet-provider": "^1.0.4"
