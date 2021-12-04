@@ -1,15 +1,14 @@
 type GroupData @entity {
   id:          ID!
-  groupId:     Bytes!
   groupAmount: BigDecimal!
-  pooledGas:   BigInt!
+  groupGwei:   BigInt!
+  fromToken:   Bytes!
+  toToken:     Bytes!
 }
 
 type UserData @entity {
-  id:       ID!
-  address:  Bytes!
-  groupIds: [Bytes!]!
-  amounts:  [BigDecimal!]!
+  id:           ID!
+  groupMap: String!
 }
 
 type GroupExecuted @entity {

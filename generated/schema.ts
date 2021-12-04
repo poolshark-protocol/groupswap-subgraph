@@ -16,9 +16,10 @@ export class GroupData extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("groupId", Value.fromBytes(Bytes.empty()));
     this.set("groupAmount", Value.fromBigDecimal(BigDecimal.zero()));
-    this.set("pooledGas", Value.fromBigInt(BigInt.zero()));
+    this.set("groupGwei", Value.fromBigInt(BigInt.zero()));
+    this.set("fromToken", Value.fromBytes(Bytes.empty()));
+    this.set("toToken", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -47,15 +48,6 @@ export class GroupData extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get groupId(): Bytes {
-    let value = this.get("groupId");
-    return value!.toBytes();
-  }
-
-  set groupId(value: Bytes) {
-    this.set("groupId", Value.fromBytes(value));
-  }
-
   get groupAmount(): BigDecimal {
     let value = this.get("groupAmount");
     return value!.toBigDecimal();
@@ -65,13 +57,31 @@ export class GroupData extends Entity {
     this.set("groupAmount", Value.fromBigDecimal(value));
   }
 
-  get pooledGas(): BigInt {
-    let value = this.get("pooledGas");
+  get groupGwei(): BigInt {
+    let value = this.get("groupGwei");
     return value!.toBigInt();
   }
 
-  set pooledGas(value: BigInt) {
-    this.set("pooledGas", Value.fromBigInt(value));
+  set groupGwei(value: BigInt) {
+    this.set("groupGwei", Value.fromBigInt(value));
+  }
+
+  get fromToken(): Bytes {
+    let value = this.get("fromToken");
+    return value!.toBytes();
+  }
+
+  set fromToken(value: Bytes) {
+    this.set("fromToken", Value.fromBytes(value));
+  }
+
+  get toToken(): Bytes {
+    let value = this.get("toToken");
+    return value!.toBytes();
+  }
+
+  set toToken(value: Bytes) {
+    this.set("toToken", Value.fromBytes(value));
   }
 }
 
@@ -80,9 +90,7 @@ export class UserData extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("address", Value.fromBytes(Bytes.empty()));
-    this.set("groupIds", Value.fromBytesArray(new Array(0)));
-    this.set("amounts", Value.fromBigDecimalArray(new Array(0)));
+    this.set("groupMap", Value.fromString(""));
   }
 
   save(): void {
@@ -111,31 +119,13 @@ export class UserData extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get address(): Bytes {
-    let value = this.get("address");
-    return value!.toBytes();
+  get groupMap(): string {
+    let value = this.get("groupMap");
+    return value!.toString();
   }
 
-  set address(value: Bytes) {
-    this.set("address", Value.fromBytes(value));
-  }
-
-  get groupIds(): Array<Bytes> {
-    let value = this.get("groupIds");
-    return value!.toBytesArray();
-  }
-
-  set groupIds(value: Array<Bytes>) {
-    this.set("groupIds", Value.fromBytesArray(value));
-  }
-
-  get amounts(): Array<BigDecimal> {
-    let value = this.get("amounts");
-    return value!.toBigDecimalArray();
-  }
-
-  set amounts(value: Array<BigDecimal>) {
-    this.set("amounts", Value.fromBigDecimalArray(value));
+  set groupMap(value: string) {
+    this.set("groupMap", Value.fromString(value));
   }
 }
 
