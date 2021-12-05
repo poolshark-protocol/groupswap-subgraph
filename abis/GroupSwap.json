@@ -19,7 +19,7 @@
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
+          "indexed": true,
           "internalType": "bytes32",
           "name": "groupId",
           "type": "bytes32"

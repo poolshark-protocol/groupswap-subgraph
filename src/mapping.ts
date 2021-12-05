@@ -31,7 +31,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   let groupEntity = GroupData.load(groupId.toHex())
 
   if (!groupEntity) {
-    groupEntity = new GroupData(event.transaction.from.toHex())
+    groupEntity = new GroupData(groupId.toHex())
     groupEntity.groupAmount = BigInt.fromI32(0).toBigDecimal()
     groupEntity.groupGwei = BigInt.fromI32(0)
   }
@@ -46,7 +46,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   let userEntity = UserData.load(event.params.user.toHex())
 
   if (!userEntity) {
-    userEntity = new UserData(event.transaction.from.toHex())
+    userEntity = new UserData(userAccount.toHex())
     userEntity.groupAmounts = "{}";
   }
 

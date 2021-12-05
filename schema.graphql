@@ -1,9 +1,7 @@
 type GroupData @entity {
   id:          ID!
-  groupAmount: BigDecimal!
+  groupAmount: BigInt!
   groupGwei:   BigInt!
-  fromToken:   Bytes!
-  toToken:     Bytes!
 }
 
 type UserData @entity {

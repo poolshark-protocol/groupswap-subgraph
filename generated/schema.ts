@@ -16,10 +16,8 @@ export class GroupData extends Entity {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("groupAmount", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("groupAmount", Value.fromBigInt(BigInt.zero()));
     this.set("groupGwei", Value.fromBigInt(BigInt.zero()));
-    this.set("fromToken", Value.fromBytes(Bytes.empty()));
-    this.set("toToken", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -48,13 +46,13 @@ export class GroupData extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get groupAmount(): BigDecimal {
+  get groupAmount(): BigInt {
     let value = this.get("groupAmount");
-    return value!.toBigDecimal();
+    return value!.toBigInt();
   }
 
-  set groupAmount(value: BigDecimal) {
-    this.set("groupAmount", Value.fromBigDecimal(value));
+  set groupAmount(value: BigInt) {
+    this.set("groupAmount", Value.fromBigInt(value));
   }
 
   get groupGwei(): BigInt {
@@ -64,24 +62,6 @@ export class GroupData extends Entity {
 
   set groupGwei(value: BigInt) {
     this.set("groupGwei", Value.fromBigInt(value));
-  }
-
-  get fromToken(): Bytes {
-    let value = this.get("fromToken");
-    return value!.toBytes();
-  }
-
-  set fromToken(value: Bytes) {
-    this.set("fromToken", Value.fromBytes(value));
-  }
-
-  get toToken(): Bytes {
-    let value = this.get("toToken");
-    return value!.toBytes();
-  }
-
-  set toToken(value: Bytes) {
-    this.set("toToken", Value.fromBytes(value));
   }
 }
 

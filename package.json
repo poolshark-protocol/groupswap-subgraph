@@ -9,20 +9,17 @@
     "codegen": "graph codegen",
     "build": "graph build",
     "deploy": "graph deploy example --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-local": "graph deploy example --ipfs http://localhost:5001 --node http://127.0.0.1:8020"
+    "deploy-local": "graph deploy example --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
+    "test": "graph test GroupSwap"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.25.0",
-    "@graphprotocol/graph-ts": "^0.24.1"
+    "@graphprotocol/graph-cli": "^0.23.1",
+    "@graphprotocol/graph-ts": "^0.23.1",
+    "matchstick-as": "^0.2.0",
+    "libpq": "^1.8.9"
   },
   "dependencies": {
     "assemblyscript-json": "^1.1.0",
-    "babel-polyfill": "^6.26.0",
-    "babel-register": "^6.26.0",
-    "json-as": "^0.2.6",
-    "matchstick-as": "^0.2.0",
-    "truffle": "^5.0.4",
-    "truffle-contract": "^4.0.5",
-    "truffle-hdwallet-provider": "^1.0.4"
+    "json-as": "^0.2.6"
   }
 }
