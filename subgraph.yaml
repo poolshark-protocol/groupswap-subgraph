@@ -25,16 +25,16 @@ dataSources:
         - name: GroupSwap
           file: ./abis/GroupSwap.json
       eventHandlers:
-        - event: DepositedToGroup(indexed bytes32,address,uint192,uint64)
+        - event: DepositedToGroup(indexed bytes32,indexed address,uint192,uint64)
           handler: handleDepositedToGroup
-        - event: WithdrawRequested(bytes32,address,uint192,uint64,address)
+        - event: WithdrawRequested(indexed bytes32,indexed address,uint192,uint64,address)
           handler: handleWithdrawRequested
-        - event: WithdrawDeclined(bytes32,address,address)
+        - event: WithdrawDeclined(indexed bytes32,indexed address,address)
           handler: handleWithdrawDeclined
-        - event: WithdrawnFromGroupPre(bytes32,address,uint256)
+        - event: WithdrawnFromGroupPre(indexed bytes32,indexed address,uint256)
           handler: handleWithdrawFromGroupPre
-        - event: WithdrawnFromGroupPost(bytes32,address,uint256)
+        - event: WithdrawnFromGroupPost(indexed bytes32,indexed address,uint256)
           handler: handleWithdrawFromGroupPost
-        - event: GroupExecuted(bytes32,uint256)
+        - event: GroupExecuted(indexed bytes32,uint256)
           handler: handleGroupExecuted
       file: ./src/mapping.ts

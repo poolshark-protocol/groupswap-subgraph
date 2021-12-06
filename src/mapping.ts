@@ -32,11 +32,11 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
 
   if (!groupEntity) {
     groupEntity = new GroupData(groupId.toHex())
-    groupEntity.groupAmount = BigInt.fromI32(0).toBigDecimal()
+    groupEntity.groupAmount = BigInt.fromI32(0)
     groupEntity.groupGwei = BigInt.fromI32(0)
   }
 
-  groupEntity.groupAmount = groupEntity.groupAmount.plus(depositAmount.toBigDecimal())
+  groupEntity.groupAmount = groupEntity.groupAmount.plus(depositAmount)
   groupEntity.groupGwei = groupEntity.groupGwei.plus(userGas)
 
   //save groupEntity
@@ -55,7 +55,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   
   //if groupId exists
   if(groupAmounts.keys.indexOf(groupId.toString()) >= 0){
-    //newGroupAmount = BigInt.fromString(groupAmounts.getString(groupId.toString()).stringify()).plus(depositAmount);
+    newGroupAmount = BigInt.fromString(groupAmounts.getString(groupId.toString()).stringify()).plus(depositAmount);
   }
   //if groupId doesn't exist
   else{
