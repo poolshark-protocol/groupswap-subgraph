@@ -1,4 +1,4 @@
-import { Address, ethereum, Bytes, BigInt } from "@graphprotocol/graph-ts"
+import { Address, ethereum, Bytes, BigInt} from "@graphprotocol/graph-ts"
 import { newMockEvent } from "matchstick-as/assembly/index"
 
 import { GroupData } from "../../generated/schema"

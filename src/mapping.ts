@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, Bytes, TypedMap, TypedMapEntry } from "@graphprotocol/graph-ts"
+import { BigDecimal, BigInt, ByteArray, Bytes, TypedMap, TypedMapEntry } from "@graphprotocol/graph-ts"
 import {
   DepositedToGroup,
   GroupExecuted,
