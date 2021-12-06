@@ -44,7 +44,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   groupEntity.save()
 
   //UserData
-  // let userEntity = UserData.load(event.params.user.toHex())
+  let userEntity = UserData.load(event.params.user.toHex())
 
   // if (!userEntity) {
   //   userEntity = new UserData(userAccount.toHex())
