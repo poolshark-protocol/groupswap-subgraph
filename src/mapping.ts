@@ -19,7 +19,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
 
   //event params
   event;
-  //let groupId = event.params.groupId;
+  let groupId = event.params.groupId;
   let userAccount = event.params.user;
   let depositAmount = event.params.amount;
   let userGas = event.params.userGas;
@@ -29,19 +29,19 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // create new GroupData if the pair doesn't exist
 
   //GroupData
-  // let groupEntity = GroupData.load(groupId.toHex())
+  let groupEntity = GroupData.load(groupId.toHex())
 
-  // if (!groupEntity) {
-  //   groupEntity = new GroupData(groupId.toHex())
-  //   groupEntity.groupAmount = BigInt.fromI32(0)
-  //   groupEntity.groupGwei = BigInt.fromI32(0)
-  // }
+  if (!groupEntity) {
+    groupEntity = new GroupData(groupId.toHex())
+    groupEntity.groupAmount = BigInt.fromI32(0)
+    groupEntity.groupGwei = BigInt.fromI32(0)
+  }
 
-  // groupEntity.groupAmount = groupEntity.groupAmount.plus(depositAmount)
-  // groupEntity.groupGwei = groupEntity.groupGwei.plus(userGas)
+  groupEntity.groupAmount = groupEntity.groupAmount.plus(depositAmount)
+  groupEntity.groupGwei = groupEntity.groupGwei.plus(userGas)
 
-  // //save groupEntity
-  // groupEntity.save()
+  //save groupEntity
+  groupEntity.save()
 
   //UserData
   // let userEntity = UserData.load(event.params.user.toHex())

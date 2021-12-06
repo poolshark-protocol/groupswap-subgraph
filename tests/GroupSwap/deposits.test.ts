@@ -31,7 +31,7 @@ test("handleDepositedToGroup - should handle new groupEntity", () => {
 
     // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
-      "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e",
+      Bytes.fromHexString("0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e"),
       "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
       BigInt.fromI32(1),
       BigInt.fromI32(2),
