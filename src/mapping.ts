@@ -18,7 +18,8 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // needs to be unique across all entities of the same type
 
   //event params
-  let groupId = event.params.groupId;
+  event;
+  //let groupId = event.params.groupId;
   let userAccount = event.params.user;
   let depositAmount = event.params.amount;
   let userGas = event.params.userGas;

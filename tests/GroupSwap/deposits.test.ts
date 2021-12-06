@@ -37,7 +37,7 @@ test("handleDepositedToGroup - should handle new groupEntity", () => {
       BigInt.fromI32(2),
   )
 
-  //handleNewDepositedToGroups([newDepositedToGroupEvent])
+  handleNewDepositedToGroups([newDepositedToGroupEvent])
 
   // assert.fieldEquals(
   //     USERDATA_ENTITY_TYPE,
