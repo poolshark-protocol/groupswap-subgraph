@@ -28,39 +28,39 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // create new GroupData if the pair doesn't exist
 
   //GroupData
-  let groupEntity = GroupData.load(groupId.toHex())
+  // let groupEntity = GroupData.load(groupId.toHex())
 
-  if (!groupEntity) {
-    groupEntity = new GroupData(groupId.toHex())
-    groupEntity.groupAmount = BigInt.fromI32(0)
-    groupEntity.groupGwei = BigInt.fromI32(0)
-  }
+  // if (!groupEntity) {
+  //   groupEntity = new GroupData(groupId.toHex())
+  //   groupEntity.groupAmount = BigInt.fromI32(0)
+  //   groupEntity.groupGwei = BigInt.fromI32(0)
+  // }
 
-  groupEntity.groupAmount = groupEntity.groupAmount.plus(depositAmount)
-  groupEntity.groupGwei = groupEntity.groupGwei.plus(userGas)
+  // groupEntity.groupAmount = groupEntity.groupAmount.plus(depositAmount)
+  // groupEntity.groupGwei = groupEntity.groupGwei.plus(userGas)
 
-  //save groupEntity
-  groupEntity.save()
+  // //save groupEntity
+  // groupEntity.save()
 
   //UserData
-  let userEntity = UserData.load(event.params.user.toHex())
+  // let userEntity = UserData.load(event.params.user.toHex())
 
-  if (!userEntity) {
-    userEntity = new UserData(userAccount.toHex())
-    userEntity.groupAmounts = "{}";
-  }
+  // if (!userEntity) {
+  //   userEntity = new UserData(userAccount.toHex())
+  //   userEntity.groupAmounts = "{}";
+  // }
 
-  let groupAmounts: JSON.Obj = <JSON.Obj>JSON.parse(userEntity.groupAmounts)
-  let newGroupAmount = BigInt.fromI32(0);
+  // let groupAmounts: JSON.Obj = <JSON.Obj>JSON.parse(userEntity.groupAmounts)
+  // let newGroupAmount = BigInt.fromI32(0);
   
-  //if groupId exists
-  if(groupAmounts.keys.indexOf(groupId.toString()) >= 0){
-    newGroupAmount = BigInt.fromString(groupAmounts.getString(groupId.toString()).stringify()).plus(depositAmount);
-  }
-  //if groupId doesn't exist
-  else{
-    newGroupAmount = depositAmount
-  }
+  // //if groupId exists
+  // if(groupAmounts.keys.indexOf(groupId.toString()) >= 0){
+  //   //newGroupAmount = BigInt.fromString(groupAmounts.getString(groupId.toString()).stringify()).plus(depositAmount);
+  // }
+  // //if groupId doesn't exist
+  // else{
+  //   newGroupAmount = depositAmount
+  // }
 
   //groupAmounts[groupId.toString()].set(newGroupAmount);
 
@@ -68,7 +68,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
 
 
   // Entities can be written to the store with `.save()`
-  userEntity.save()
+  //userEntity.save()
   
 
   //add current group to userEntity if missing
