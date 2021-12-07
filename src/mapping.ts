@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, ByteArray, Bytes, TypedMap, TypedMapEntry } from "@graphprotocol/graph-ts"
+import { BigDecimal, BigInt, ByteArray, Bytes, TypedMap, TypedMapEntry, Address } from "@graphprotocol/graph-ts"
 import {
   DepositedToGroup,
   GroupExecuted,
@@ -18,9 +18,8 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // needs to be unique across all entities of the same type
 
   //event params
-  event;
   let groupId = event.params.groupId;
-  let userAccount = event.params.user;
+  let user = event.params.user;
   let depositAmount = event.params.amount;
   let userGas = event.params.userGas;
 
@@ -44,32 +43,33 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   groupEntity.save()
 
   //UserData
-  let userEntity = UserData.load(event.params.user.toHex())
+  let userEntity = UserData.load(user.toHexString())
 
-  // if (!userEntity) {
-  //   userEntity = new UserData(userAccount.toHex())
-  //   userEntity.groupAmounts = "{}";
-  // }
-
-  // let groupAmounts: JSON.Obj = <JSON.Obj>JSON.parse(userEntity.groupAmounts)
-  // let newGroupAmount = BigInt.fromI32(0);
+  if (!userEntity) {
+    userEntity = new UserData(user.toHex())
+    userEntity.groupAmounts = "{}";
+  }
   
-  // //if groupId exists
-  // if(groupAmounts.keys.indexOf(groupId.toString()) >= 0){
-  //   //newGroupAmount = BigInt.fromString(groupAmounts.getString(groupId.toString()).stringify()).plus(depositAmount);
-  // }
-  // //if groupId doesn't exist
-  // else{
-  //   newGroupAmount = depositAmount
-  // }
 
-  //groupAmounts[groupId.toString()].set(newGroupAmount);
+  let groupAmounts: JSON.Obj = <JSON.Obj>JSON.parse(userEntity.groupAmounts)
+  let fromAmount = BigInt.fromI32(0);
+  
+  //if groupId exists
+  if(groupAmounts.keys.indexOf(groupId.toString()) >= 0){
+    //fromAmount = BigInt.fromString(groupAmounts.get(groupId.toString()).stringify()).plus(depositAmount);
+  }
+  //if groupId doesn't exist
+  else{
+    fromAmount = depositAmount
+  }
 
-  //userEntity.groupAmounts = JSON.stringify(groupAmounts)
+  //groupAmounts.set(groupId.toHex(), fromAmount)
+
+  userEntity.groupAmounts = groupAmounts.stringify()
 
 
   // Entities can be written to the store with `.save()`
-  //userEntity.save()
+  userEntity.save()
   
 
   //add current group to userEntity if missing
