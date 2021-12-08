@@ -9,10 +9,17 @@ type UserData @entity {
   groupAmounts: String!
 }
 
+type OrderData @entity {
+  id:           ID!
+  fromToken:    Bytes!
+  destToken:    Bytes!
+  fromAmount:   BigInt
+}
+
 type GroupExecuted @entity {
   id:           ID!
   groupId:      Bytes!
-  returnAmount: BigDecimal!
+  returnAmount: BigInt!
   usedGas:      BigInt!
 }
 
@@ -20,19 +27,19 @@ type WithdrawRequest @entity {
   id:       ID!
   address:  Bytes!
   groupIds: [Bytes!]!
-  amounts:  [BigDecimal!]!
+  amounts:  [BigInt!]!
 }
 
 type WithdrawApproved @entity {
   id:       ID!
   address:  Bytes!
   groupIds: [Bytes!]!
-  amounts:  [BigDecimal!]!
+  amounts:  [BigInt!]!
 }
 
 type WithdrawDeclined @entity {
   id:       ID!
   address:  Bytes!
   groupIds: [Bytes!]!
-  amounts:  [BigDecimal!]!
+  amounts:  [BigInt!]!
 }

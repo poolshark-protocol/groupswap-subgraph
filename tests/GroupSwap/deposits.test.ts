@@ -46,20 +46,18 @@ test("Can initialise store with an array of Entity objects", () => {
   userData.groupAmounts = groupAmounts.stringify()
   userData.save()
 
-  logStore()
-
   assert.fieldEquals(USERDATA_ENTITY_TYPE, "0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7",
                                             "id",
                                             "0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7")  
 
-  // assert.fieldEquals(USERDATA_ENTITY_TYPE, "0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7",
-  //                                           "groupAmounts",
-  //                                           "{}")  
+  assert.fieldEquals(USERDATA_ENTITY_TYPE, "0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7",
+                                            "groupAmounts",
+                                            "{\"groupId1\":{\"fromAddress\":\"0x1\",\"destAddress\":\"0x2\",\"fromAmount\":10000000000,\"destAmount\":0}}")  
 
   clearStore()
 })
   
-test("handleDepositedToGroup - should handle new groupEntity", () => {
+test("handleDepositedToGroup - should handle new GroupData", () => {
 
     // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
@@ -95,7 +93,7 @@ test("handleDepositedToGroup - should handle new groupEntity", () => {
   clearStore()
 })
 
-test("handleDepositedToGroup - should handle existing groupEntity", () => {
+test("handleDepositedToGroup - should handle existing GroupData", () => {
 
   let deposit = new GroupData("0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e")
   deposit.groupAmount = BigInt.fromI32(2)
@@ -136,7 +134,7 @@ test("handleDepositedToGroup - should handle existing groupEntity", () => {
   clearStore()
 })
 
-test("handleDepositedToGroup - should handle new UserData entity", () => {
+test("handleDepositedToGroup - should handle new UserData", () => {
 
   // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
@@ -163,6 +161,49 @@ test("handleDepositedToGroup - should handle new UserData entity", () => {
     "groupAmounts",
     "{}"
   )
+
+  clearStore()
+})
+
+test("handleDepositedToGroup - should handle existing UserData", () => {
+  let address = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
+  let userData = new UserData(address.toHexString())
+  let jsonString = "{}"
+  
+
+  let groupAmounts: JSON.Obj = <JSON.Obj>JSON.parse(jsonString)
+  let groupAmount: JSON.Obj = new JSON.Obj()
+  groupAmount.set("fromAddress","0x1")
+  groupAmount.set("destAddress","0x2")
+  groupAmount.set("fromAmount",10000000000)
+  groupAmount.set("destAmount",0)
+  groupAmounts.set("groupId1",groupAmount)
+  
+  userData.groupAmounts = groupAmounts.stringify()
+  userData.save()
+
+  
+
+  // Call mappings
+  let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
+      Bytes.fromHexString("0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e"),
+      "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
+      BigInt.fromI32(1),
+      BigInt.fromI32(2),
+  )
+
+  handleNewDepositedToGroups([newDepositedToGroupEvent])
+
+  logStore()
+
+  assert.fieldEquals(USERDATA_ENTITY_TYPE, "0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7",
+  "id",
+  "0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7")  
+
+  assert.fieldEquals(USERDATA_ENTITY_TYPE, "0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7",
+  "groupAmounts",
+  "{\"groupId1\":{\"fromAddress\":\"0x1\",\"destAddress\":\"0x2\",\"fromAmount\":20000000000,\"destAmount\":0}}")  
+
 
   clearStore()
 })

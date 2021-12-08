@@ -19,7 +19,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
 
   //event params
   let groupId = event.params.groupId;
-  let user = event.params.user;
+  let account = event.params.user;
   let depositAmount = event.params.amount;
   let userGas = event.params.userGas;
 
@@ -43,29 +43,41 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   groupEntity.save()
 
   //UserData
-  let userEntity = UserData.load(user.toHexString())
+  let userEntity = UserData.load(account.toHexString())
 
   if (!userEntity) {
-    userEntity = new UserData(user.toHex())
+    userEntity = new UserData(account.toHex())
     userEntity.groupAmounts = "{}";
   }
   
 
   let groupAmounts: JSON.Obj = <JSON.Obj>JSON.parse(userEntity.groupAmounts)
-  let fromAmount = BigInt.fromI32(0);
+  let groupAmountObj: JSON.Obj | null = groupAmounts.getObj(groupId.toHex())
+  let fromAmount: BigInt = BigInt.fromI32(0);
   
-  //if groupId exists
-  if(groupAmounts.keys.indexOf(groupId.toString()) >= 0){
-    //fromAmount = BigInt.fromString(groupAmounts.get(groupId.toString()).stringify()).plus(depositAmount);
+  // //if groupId exists
+  if(groupAmountObj){
+    let groupAmount: JSON.Obj = <JSON.Obj>JSON.parse(groupAmountObj.valueOf())
+    let fromAmountStr: JSON.Str | null = groupAmount.getString("fromAmount")
+    if(fromAmountStr){
+      fromAmount = BigInt.fromString(JSON.parse(fromAmountStr.valueOf()).toString()).plus(depositAmount)
+      groupAmount.set("fromAmount", fromAmount.toString())
+      groupAmounts.set(groupId.toHex(), groupAmount)
+    } 
   }
-  //if groupId doesn't exist
-  else{
-    fromAmount = depositAmount
-  }
+  // //if groupId doesn't exist
+  // else{
+  //   groupAmount = new JSON.Obj()
+  //   groupAmount.set("fromAddress","0x1")
+  //   groupAmount.set("destAddress","0x2")
+  //   groupAmount.set("fromAmount",depositAmount)
+  //   groupAmount.set("destAmount",0)
+  //   groupAmounts.set("groupId1",groupAmount)
+  // }
+  
+  
 
-  //groupAmounts.set(groupId.toHex(), fromAmount)
-
-  userEntity.groupAmounts = groupAmounts.stringify()
+  //userEntity.groupAmounts = groupAmounts.stringify()
 
 
   // Entities can be written to the store with `.save()`
@@ -87,7 +99,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // example, the contract that has emitted the event can be connected to
   // with:
   //
-  // let contract = Contract.bind(event.address)
+  //let contract = Contract.bind(event.address)
   //
   // The following functions can then be called on this contract to access
   // state variables and other data:

@@ -109,13 +109,84 @@ export class UserData extends Entity {
   }
 }
 
+export class OrderData extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("fromToken", Value.fromBytes(Bytes.empty()));
+    this.set("destToken", Value.fromBytes(Bytes.empty()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save OrderData entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save OrderData entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("OrderData", id.toString(), this);
+    }
+  }
+
+  static load(id: string): OrderData | null {
+    return changetype<OrderData | null>(store.get("OrderData", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get fromToken(): Bytes {
+    let value = this.get("fromToken");
+    return value!.toBytes();
+  }
+
+  set fromToken(value: Bytes) {
+    this.set("fromToken", Value.fromBytes(value));
+  }
+
+  get destToken(): Bytes {
+    let value = this.get("destToken");
+    return value!.toBytes();
+  }
+
+  set destToken(value: Bytes) {
+    this.set("destToken", Value.fromBytes(value));
+  }
+
+  get fromAmount(): BigInt | null {
+    let value = this.get("fromAmount");
+    if (!value || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set fromAmount(value: BigInt | null) {
+    if (!value) {
+      this.unset("fromAmount");
+    } else {
+      this.set("fromAmount", Value.fromBigInt(<BigInt>value));
+    }
+  }
+}
+
 export class GroupExecuted extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
     this.set("groupId", Value.fromBytes(Bytes.empty()));
-    this.set("returnAmount", Value.fromBigDecimal(BigDecimal.zero()));
+    this.set("returnAmount", Value.fromBigInt(BigInt.zero()));
     this.set("usedGas", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -154,13 +225,13 @@ export class GroupExecuted extends Entity {
     this.set("groupId", Value.fromBytes(value));
   }
 
-  get returnAmount(): BigDecimal {
+  get returnAmount(): BigInt {
     let value = this.get("returnAmount");
-    return value!.toBigDecimal();
+    return value!.toBigInt();
   }
 
-  set returnAmount(value: BigDecimal) {
-    this.set("returnAmount", Value.fromBigDecimal(value));
+  set returnAmount(value: BigInt) {
+    this.set("returnAmount", Value.fromBigInt(value));
   }
 
   get usedGas(): BigInt {
@@ -180,7 +251,7 @@ export class WithdrawRequest extends Entity {
 
     this.set("address", Value.fromBytes(Bytes.empty()));
     this.set("groupIds", Value.fromBytesArray(new Array(0)));
-    this.set("amounts", Value.fromBigDecimalArray(new Array(0)));
+    this.set("amounts", Value.fromBigIntArray(new Array(0)));
   }
 
   save(): void {
@@ -227,13 +298,13 @@ export class WithdrawRequest extends Entity {
     this.set("groupIds", Value.fromBytesArray(value));
   }
 
-  get amounts(): Array<BigDecimal> {
+  get amounts(): Array<BigInt> {
     let value = this.get("amounts");
-    return value!.toBigDecimalArray();
+    return value!.toBigIntArray();
   }
 
-  set amounts(value: Array<BigDecimal>) {
-    this.set("amounts", Value.fromBigDecimalArray(value));
+  set amounts(value: Array<BigInt>) {
+    this.set("amounts", Value.fromBigIntArray(value));
   }
 }
 
@@ -244,7 +315,7 @@ export class WithdrawApproved extends Entity {
 
     this.set("address", Value.fromBytes(Bytes.empty()));
     this.set("groupIds", Value.fromBytesArray(new Array(0)));
-    this.set("amounts", Value.fromBigDecimalArray(new Array(0)));
+    this.set("amounts", Value.fromBigIntArray(new Array(0)));
   }
 
   save(): void {
@@ -293,13 +364,13 @@ export class WithdrawApproved extends Entity {
     this.set("groupIds", Value.fromBytesArray(value));
   }
 
-  get amounts(): Array<BigDecimal> {
+  get amounts(): Array<BigInt> {
     let value = this.get("amounts");
-    return value!.toBigDecimalArray();
+    return value!.toBigIntArray();
   }
 
-  set amounts(value: Array<BigDecimal>) {
-    this.set("amounts", Value.fromBigDecimalArray(value));
+  set amounts(value: Array<BigInt>) {
+    this.set("amounts", Value.fromBigIntArray(value));
   }
 }
 
@@ -310,7 +381,7 @@ export class WithdrawDeclined extends Entity {
 
     this.set("address", Value.fromBytes(Bytes.empty()));
     this.set("groupIds", Value.fromBytesArray(new Array(0)));
-    this.set("amounts", Value.fromBigDecimalArray(new Array(0)));
+    this.set("amounts", Value.fromBigIntArray(new Array(0)));
   }
 
   save(): void {
@@ -359,12 +430,12 @@ export class WithdrawDeclined extends Entity {
     this.set("groupIds", Value.fromBytesArray(value));
   }
 
-  get amounts(): Array<BigDecimal> {
+  get amounts(): Array<BigInt> {
     let value = this.get("amounts");
-    return value!.toBigDecimalArray();
+    return value!.toBigIntArray();
   }
 
-  set amounts(value: Array<BigDecimal>) {
-    this.set("amounts", Value.fromBigDecimalArray(value));
+  set amounts(value: Array<BigInt>) {
+    this.set("amounts", Value.fromBigIntArray(value));
   }
 }
