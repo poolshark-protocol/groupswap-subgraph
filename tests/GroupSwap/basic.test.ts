@@ -2,7 +2,7 @@
 import { assert, createMockedFunction, clearStore, test, newMockEvent, newMockCall ,} from "matchstick-as/assembly/index"
 import { BigInt, Bytes, store, Value } from "@graphprotocol/graph-ts"
 import { ethereum, Address} from "@graphprotocol/graph-ts"
-import { GroupData } from "../../generated/schema"
+import { GroupOrder } from "../../generated/schema"
 import { GroupSwap } from "../../generated/PredaDex/GroupSwap"
 
 

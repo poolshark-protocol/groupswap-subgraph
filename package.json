@@ -10,7 +10,7 @@
     "build": "graph build",
     "deploy": "graph deploy example --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
     "deploy-local": "graph deploy example --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
-    "test": "graph test"
+    "test": "graph test -v 0.2.0"
   },
   "devDependencies": {
     "@graphprotocol/graph-cli": "^0.23.1",
@@ -20,7 +20,6 @@
   },
   "dependencies": {
     "assemblyscript-json": "^1.1.0",
-    "json-as": "^0.2.6",
-    "ts-node": "^10.4.0"
+    "json-as": "^0.2.6"
   }
 }

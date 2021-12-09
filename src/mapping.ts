@@ -8,7 +8,7 @@ import {
   WithdrawnFromGroupPre
 } from "../generated/PredaDex/GroupSwap"
 import { 
- GroupData, OrderData, UserData
+ GroupOrder, UserOrder, UserAccount
 } from "../generated/schema"
 
 import { JSON } from "assemblyscript-json"; 
@@ -31,10 +31,10 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // create new GroupData if the pair doesn't exist
 
   //GroupData
-  let groupEntity = GroupData.load(groupId.toHex())
+  let groupEntity = GroupOrder.load(groupId.toHex())
 
   if (!groupEntity) {
-    groupEntity = new GroupData(groupId.toHex())
+    groupEntity = new GroupOrder(groupId.toHex())
     groupEntity.groupAmount = BigInt.fromI32(0)
     groupEntity.groupGwei = BigInt.fromI32(0)
   }
@@ -48,10 +48,10 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   groupEntity.save()
 
   //UserData
-  let userEntity = UserData.load(account.toHex())
+  let userEntity = UserAccount.load(account.toHex())
 
   if (!userEntity) {
-    userEntity = new UserData(account.toHex())
+    userEntity = new UserAccount(account.toHex())
     userEntity.groupAmounts = "{}";
   }
 
@@ -86,12 +86,13 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   userEntity.save()
 
   // OrderData
-  let orderEntity = new OrderData(txnHash.toHex())
+  let orderEntity = new UserOrder(txnHash.toHex())
 
   orderEntity.gweiAdded  = userGas
   orderEntity.fromToken  = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
   orderEntity.destToken  = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
   orderEntity.fromAmount = depositAmount
+  orderEntity.account    = account
 
   orderEntity.save()
 }

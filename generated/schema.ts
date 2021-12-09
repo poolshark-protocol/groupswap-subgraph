@@ -11,7 +11,7 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class GroupData extends Entity {
+export class GroupOrder extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -24,19 +24,19 @@ export class GroupData extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save GroupData entity without an ID");
+    assert(id != null, "Cannot save GroupOrder entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save GroupData entity with non-string ID. " +
+        "Cannot save GroupOrder entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("GroupData", id.toString(), this);
+      store.set("GroupOrder", id.toString(), this);
     }
   }
 
-  static load(id: string): GroupData | null {
-    return changetype<GroupData | null>(store.get("GroupData", id));
+  static load(id: string): GroupOrder | null {
+    return changetype<GroupOrder | null>(store.get("GroupOrder", id));
   }
 
   get id(): string {
@@ -85,7 +85,7 @@ export class GroupData extends Entity {
   }
 }
 
-export class UserData extends Entity {
+export class UserAccount extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -95,19 +95,19 @@ export class UserData extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save UserData entity without an ID");
+    assert(id != null, "Cannot save UserAccount entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save UserData entity with non-string ID. " +
+        "Cannot save UserAccount entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("UserData", id.toString(), this);
+      store.set("UserAccount", id.toString(), this);
     }
   }
 
-  static load(id: string): UserData | null {
-    return changetype<UserData | null>(store.get("UserData", id));
+  static load(id: string): UserAccount | null {
+    return changetype<UserAccount | null>(store.get("UserAccount", id));
   }
 
   get id(): string {
@@ -129,11 +129,12 @@ export class UserData extends Entity {
   }
 }
 
-export class OrderData extends Entity {
+export class UserOrder extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
+    this.set("account", Value.fromBytes(Bytes.empty()));
     this.set("fromToken", Value.fromBytes(Bytes.empty()));
     this.set("destToken", Value.fromBytes(Bytes.empty()));
     this.set("fromAmount", Value.fromBigInt(BigInt.zero()));
@@ -142,19 +143,19 @@ export class OrderData extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save OrderData entity without an ID");
+    assert(id != null, "Cannot save UserOrder entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save OrderData entity with non-string ID. " +
+        "Cannot save UserOrder entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("OrderData", id.toString(), this);
+      store.set("UserOrder", id.toString(), this);
     }
   }
 
-  static load(id: string): OrderData | null {
-    return changetype<OrderData | null>(store.get("OrderData", id));
+  static load(id: string): UserOrder | null {
+    return changetype<UserOrder | null>(store.get("UserOrder", id));
   }
 
   get id(): string {
@@ -164,6 +165,15 @@ export class OrderData extends Entity {
 
   set id(value: string) {
     this.set("id", Value.fromString(value));
+  }
+
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
   }
 
   get fromToken(): Bytes {

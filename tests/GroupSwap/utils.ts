@@ -1,7 +1,7 @@
 import { Address, ethereum, Bytes, BigInt, ByteArray} from "@graphprotocol/graph-ts"
 import { newMockEvent } from "matchstick-as/assembly/index"
 
-import { GroupData } from "../../generated/schema"
+import { GroupOrder } from "../../generated/schema"
 import { DepositedToGroup, GroupSwap } from "../../generated/PredaDex/GroupSwap"
 import { handleDepositedToGroup } from "../../src/mapping"
 

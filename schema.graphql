@@ -1,4 +1,4 @@
-type GroupData @entity {
+type GroupOrder @entity {
   id:          ID!
   groupAmount: BigInt!
   groupGwei:   BigInt!
@@ -6,13 +6,14 @@ type GroupData @entity {
   destToken:   Bytes!
 }
 
-type UserData @entity {
+type UserAccount @entity {
   id:           ID!
   groupAmounts: String!
 }
 
-type OrderData @entity {
+type UserOrder @entity {
   id:           ID!
+  account:      Bytes!
   fromToken:    Bytes!
   destToken:    Bytes!
   fromAmount:   BigInt!
