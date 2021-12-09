@@ -58,7 +58,7 @@ test("Can initialise store with an array of Entity objects", () => {
   clearStore()
 })
   
-test("handleDepositedToGroup - should handle new GroupData", () => {
+test("handleDepositedToGroup - should handle new GroupOrder", () => {
 
     // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
@@ -94,7 +94,7 @@ test("handleDepositedToGroup - should handle new GroupData", () => {
   clearStore()
 })
 
-test("handleDepositedToGroup - should handle existing GroupData", () => {
+test("handleDepositedToGroup - should handle existing GroupOrder", () => {
 
   let deposit = new GroupOrder("0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e")
   deposit.groupAmount = BigInt.fromI32(2)
@@ -135,7 +135,7 @@ test("handleDepositedToGroup - should handle existing GroupData", () => {
   clearStore()
 })
 
-test("handleDepositedToGroup - should handle new UserData", () => {
+test("handleDepositedToGroup - should handle new UserAccount", () => {
 
   // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
@@ -166,7 +166,7 @@ test("handleDepositedToGroup - should handle new UserData", () => {
   clearStore()
 })
 
-test("handleDepositedToGroup - should handle existing UserData with new group", () => {
+test("handleDepositedToGroup - should handle existing UserAccount with new group", () => {
   let address = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
   let userAccount = new UserAccount(address.toHex())
   let jsonString = "{}"
@@ -206,7 +206,7 @@ test("handleDepositedToGroup - should handle existing UserData with new group", 
   clearStore()
 })
 
-test("handleDepositedToGroup - should handle new OrderData", () => {
+test("handleDepositedToGroup - should handle new OrderAccount", () => {
   let address = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
   let userAccount = new UserAccount(address.toHex())
   let jsonString = "{}"
@@ -235,9 +235,10 @@ test("handleDepositedToGroup - should handle new OrderData", () => {
 
   logStore()
 
-  // assert.fieldEquals(USERORDER_ENTITY_TYPE, "0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7",
-  // "groupAmounts",
-  // "{\"groupId1\":{\"fromAddress\":\"0x1\",\"destAddress\":\"0x2\",\"fromAmount\":10000000000,\"destAmount\":0},\"0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e\":{\"fromToken\":\"0x1\",\"destToken\":\"0x2\",\"fromAmount\":\"1\",\"destAmount\":0}}"
-  // )
+  assert.fieldEquals(
+    USERORDER_ENTITY_TYPE, "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "id",
+    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a" 
+  )
   clearStore()
 })
