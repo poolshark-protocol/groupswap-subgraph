@@ -1,3 +1,3 @@
 # swap-rollups-subgraph
 
-TODO: use BigDecimal for amounts
+TODO: call getGroup() view function to get groupId
