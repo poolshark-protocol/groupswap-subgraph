@@ -8,7 +8,7 @@ import {
   WithdrawnFromGroupPre
 } from "../generated/PredaDex/GroupSwap"
 import { 
- GroupData, UserData
+ GroupData, OrderData, UserData
 } from "../generated/schema"
 
 import { JSON } from "assemblyscript-json"; 
@@ -22,6 +22,9 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   let account = event.params.user;
   let depositAmount = event.params.amount;
   let userGas = event.params.userGas;
+
+  //transaction data
+  let txnHash = event.transaction.hash;
 
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
@@ -38,12 +41,14 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
 
   groupEntity.groupAmount = groupEntity.groupAmount.plus(depositAmount)
   groupEntity.groupGwei = groupEntity.groupGwei.plus(userGas)
+  groupEntity.fromToken = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
+  groupEntity.destToken = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
 
   //save groupEntity
   groupEntity.save()
 
   //UserData
-  let userEntity = UserData.load(account.toHexString())
+  let userEntity = UserData.load(account.toHex())
 
   if (!userEntity) {
     userEntity = new UserData(account.toHex())
@@ -64,11 +69,12 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
       groupAmounts.set(groupId.toHex(), groupAmount)
     }
   }
+
   //if groupId doesn't exist
   else{
     let groupAmount = new JSON.Obj()
-    groupAmount.set("fromAddress","0x1")
-    groupAmount.set("destAddress","0x2")
+    groupAmount.set("fromToken","0x1")
+    groupAmount.set("destToken","0x2")
     groupAmount.set("fromAmount",depositAmount.toString())
     groupAmount.set("destAmount",0)
     groupAmounts.set(groupId.toHex(),groupAmount)
@@ -79,8 +85,16 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // Entities can be written to the store with `.save()`
   userEntity.save()
 
-}
+  // OrderData
+  let orderEntity = new OrderData(txnHash.toHex())
 
+  orderEntity.gweiAdded  = userGas
+  orderEntity.fromToken  = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
+  orderEntity.destToken  = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
+  orderEntity.fromAmount = depositAmount
+
+  orderEntity.save()
+}
 export function handleGroupExecuted(event: GroupExecuted): void {}
 
 export function handleWithdrawDeclined(event: WithdrawDeclined): void {}

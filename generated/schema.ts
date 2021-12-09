@@ -18,6 +18,8 @@ export class GroupData extends Entity {
 
     this.set("groupAmount", Value.fromBigInt(BigInt.zero()));
     this.set("groupGwei", Value.fromBigInt(BigInt.zero()));
+    this.set("fromToken", Value.fromBytes(Bytes.empty()));
+    this.set("destToken", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -62,6 +64,24 @@ export class GroupData extends Entity {
 
   set groupGwei(value: BigInt) {
     this.set("groupGwei", Value.fromBigInt(value));
+  }
+
+  get fromToken(): Bytes {
+    let value = this.get("fromToken");
+    return value!.toBytes();
+  }
+
+  set fromToken(value: Bytes) {
+    this.set("fromToken", Value.fromBytes(value));
+  }
+
+  get destToken(): Bytes {
+    let value = this.get("destToken");
+    return value!.toBytes();
+  }
+
+  set destToken(value: Bytes) {
+    this.set("destToken", Value.fromBytes(value));
   }
 }
 
@@ -116,6 +136,8 @@ export class OrderData extends Entity {
 
     this.set("fromToken", Value.fromBytes(Bytes.empty()));
     this.set("destToken", Value.fromBytes(Bytes.empty()));
+    this.set("fromAmount", Value.fromBigInt(BigInt.zero()));
+    this.set("gweiAdded", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -162,21 +184,22 @@ export class OrderData extends Entity {
     this.set("destToken", Value.fromBytes(value));
   }
 
-  get fromAmount(): BigInt | null {
+  get fromAmount(): BigInt {
     let value = this.get("fromAmount");
-    if (!value || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBigInt();
-    }
+    return value!.toBigInt();
   }
 
-  set fromAmount(value: BigInt | null) {
-    if (!value) {
-      this.unset("fromAmount");
-    } else {
-      this.set("fromAmount", Value.fromBigInt(<BigInt>value));
-    }
+  set fromAmount(value: BigInt) {
+    this.set("fromAmount", Value.fromBigInt(value));
+  }
+
+  get gweiAdded(): BigInt {
+    let value = this.get("gweiAdded");
+    return value!.toBigInt();
+  }
+
+  set gweiAdded(value: BigInt) {
+    this.set("gweiAdded", Value.fromBigInt(value));
   }
 }
 
