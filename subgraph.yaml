@@ -26,7 +26,7 @@ dataSources:
         - name: GroupSwap
           file: ./abis/GroupSwap.json
       eventHandlers:
-        - event: DepositedToGroup(indexed bytes32,indexed address,uint192,uint64)
+        - event: DepositedToGroup(bytes32,indexed address,indexed address,indexed address,uint192,uint64)
           handler: handleDepositedToGroup
         - event: WithdrawRequested(indexed bytes32,indexed address,uint192,uint64,address)
           handler: handleWithdrawRequested

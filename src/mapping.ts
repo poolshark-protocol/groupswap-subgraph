@@ -5,7 +5,8 @@ import {
   WithdrawDeclined,
   WithdrawRequested,
   WithdrawnFromGroupPost,
-  WithdrawnFromGroupPre
+  WithdrawnFromGroupPre,
+  GroupSwap
 } from "../generated/PredaDex/GroupSwap"
 import { 
  GroupOrder, UserOrder, UserAccount
@@ -17,8 +18,9 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // Entities can be loaded from the store using a string ID; this ID
   // needs to be unique across all entities of the same type
 
-  //event params
-  let groupId = event.params.groupId;
+  // //event params
+  let fromToken = event.params.fromToken;
+  let destToken = event.params.destToken;
   let account = event.params.user;
   let depositAmount = event.params.amount;
   let userGas = event.params.userGas;
@@ -29,6 +31,9 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // Entities only exist after they have been saved to the store;
   // `null` checks allow to create entities on demand
   // create new GroupData if the pair doesn't exist
+
+  let groupSwap = GroupSwap.bind(Address.fromString("0x67df0ca794467316ac8B951CAFa547B711E671Fc"))
+  let groupId = groupSwap.getGroup(fromToken, destToken)
 
   //GroupData
   let groupEntity = GroupOrder.load(groupId.toHex())
@@ -73,8 +78,8 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   //if groupId doesn't exist
   else{
     let groupAmount = new JSON.Obj()
-    groupAmount.set("fromToken","0x1")
-    groupAmount.set("destToken","0x2")
+    groupAmount.set("fromToken",fromToken.toHex())
+    groupAmount.set("destToken",destToken.toHex())
     groupAmount.set("fromAmount",depositAmount.toString())
     groupAmount.set("destAmount",0)
     groupAmounts.set(groupId.toHex(),groupAmount)
@@ -89,8 +94,8 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   let orderEntity = new UserOrder(txnHash.toHex())
 
   orderEntity.gweiAdded  = userGas
-  orderEntity.fromToken  = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
-  orderEntity.destToken  = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
+  orderEntity.fromToken  = fromToken
+  orderEntity.destToken  = destToken
   orderEntity.fromAmount = depositAmount
   orderEntity.account    = account
 

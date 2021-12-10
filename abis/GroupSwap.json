@@ -19,10 +19,22 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": true,
+        "indexed": false,
         "internalType": "bytes32",
         "name": "groupId",
         "type": "bytes32"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "fromToken",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "destToken",
+        "type": "address"
       },
       {
         "indexed": true,
