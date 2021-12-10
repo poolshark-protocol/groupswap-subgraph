@@ -62,7 +62,6 @@ test("handleDepositedToGroup - should handle new GroupOrder", () => {
 
     // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
-      Bytes.fromHexString("0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e"),
       "0x6b175474e89094c44da98b954eedeac495271d0f",
       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
@@ -70,7 +69,7 @@ test("handleDepositedToGroup - should handle new GroupOrder", () => {
       BigInt.fromI32(2),
   )
 
-  let contractAddress = Address.fromString("0x67df0ca794467316ac8B951CAFa547B711E671Fc")
+  let contractAddress = Address.fromString("0x059D3E8320726ec827188fF76a8d6C08b6f9E774")
   let contractName    = "GroupSwap"
   let functionName    = "getGroup" 
   let functionSig     = "getGroup(address,address):(bytes32)"
@@ -123,7 +122,6 @@ test("handleDepositedToGroup - should handle existing GroupOrder", () => {
 
   // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
-      Bytes.fromHexString("0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e"),
       "0x6b175474e89094c44da98b954eedeac495271d0f",
       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
@@ -162,7 +160,6 @@ test("handleDepositedToGroup - should handle new UserAccount", () => {
 
   // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
-      Bytes.fromHexString("0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e"),
       "0x6b175474e89094c44da98b954eedeac495271d0f",
       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
@@ -210,7 +207,6 @@ test("handleDepositedToGroup - should handle existing UserAccount with new group
 
   // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
-      Bytes.fromHexString("0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e"),
       "0x6b175474e89094c44da98b954eedeac495271d0f",
       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
@@ -252,7 +248,6 @@ test("handleDepositedToGroup - should handle new OrderAccount", () => {
 
   // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
-      Bytes.fromHexString("0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e"),
       "0x6b175474e89094c44da98b954eedeac495271d0f",
       "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
       "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",

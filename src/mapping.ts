@@ -32,7 +32,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // `null` checks allow to create entities on demand
   // create new GroupData if the pair doesn't exist
 
-  let groupSwap = GroupSwap.bind(Address.fromString("0x67df0ca794467316ac8B951CAFa547B711E671Fc"))
+  let groupSwap = GroupSwap.bind(Address.fromString("0x059D3E8320726ec827188fF76a8d6C08b6f9E774"))
   let groupId = groupSwap.getGroup(fromToken, destToken)
 
   //GroupData
@@ -46,8 +46,8 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
 
   groupEntity.groupAmount = groupEntity.groupAmount.plus(depositAmount)
   groupEntity.groupGwei = groupEntity.groupGwei.plus(userGas)
-  groupEntity.fromToken = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
-  groupEntity.destToken = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
+  groupEntity.fromToken = fromToken
+  groupEntity.destToken = destToken
 
   //save groupEntity
   groupEntity.save()
