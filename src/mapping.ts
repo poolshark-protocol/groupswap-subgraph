@@ -33,7 +33,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // `null` checks allow to create entities on demand
   // create new GroupData if the pair doesn't exist
 
-  let groupSwap = GroupSwap.bind(Address.fromString("0x059D3E8320726ec827188fF76a8d6C08b6f9E774"))
+  let groupSwap = GroupSwap.bind(Address.fromString("0x5101feD546FacccD309A77Ad755170f8fBf1E81D"))
   let groupId = groupSwap.getGroup(fromToken, destToken)
 
   //GroupData
@@ -121,48 +121,55 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
   let withdrawToken = event.params.withdrawToken
   let depositTxnHash = event.params.depositTxnHash
 
-  //GroupData
-  let openOrder = OpenOrder.load(depositTxnHash.toHex())
-  let completedOrder = CompletedOrder.load(depositTxnHash.toHex())
+  let cancelRequest = new CancelRequest(depositTxnHash.toHex())
+  cancelRequest.account = account
+  cancelRequest.amount = withdrawAmount
+  cancelRequest.groupId = depositTxnHash
+  cancelRequest.withdrawToken = withdrawToken
+  cancelRequest.save()
 
-  if (openOrder) {
-    let groupId = openOrder.groupId
-    let groupOrder = GroupOrder.load(groupId.toHex())
+  // //GroupData
+  // let openOrder = OpenOrder.load(depositTxnHash.toHex())
+  // let completedOrder = CompletedOrder.load(depositTxnHash.toHex())
 
-    // cancel request
-    if(groupOrder){
-      if(withdrawToken.toHex() == groupOrder.fromToken.toHex()){
-        let cancelRequest = CancelRequest.load(depositTxnHash.toHex())
+  // if (openOrder) {
+  //   let groupId = openOrder.groupId
+  //   let groupOrder = GroupOrder.load(groupId.toHex())
 
-        if(!cancelRequest){
-          cancelRequest = new CancelRequest(depositTxnHash.toHex())
-          cancelRequest.account = account
-          cancelRequest.amount = openOrder.fromAmount
-          cancelRequest.groupId = groupId
-          cancelRequest.withdrawToken = openOrder.fromToken
-          cancelRequest.save()
-        }
-      }
-    }
-  }
-  else if(completedOrder) {
-    let groupId = completedOrder.groupId
-    let groupOrder = GroupOrder.load(groupId.toHex())
+  //   // cancel request
+  //   if(groupOrder){
+  //     if(withdrawToken.toHex() == groupOrder.fromToken.toHex()){
+  //       let cancelRequest = CancelRequest.load(depositTxnHash.toHex())
 
-    // withdraw request
-    if(groupOrder){
-      if (withdrawToken.toHex() == groupOrder.destToken.toHex()){
-        let withdrawRequest = WithdrawRequest.load(depositTxnHash.toHex())
+  //       if(!cancelRequest){
+  //         cancelRequest = new CancelRequest(depositTxnHash.toHex())
+  //         cancelRequest.account = account
+  //         cancelRequest.amount = openOrder.fromAmount
+  //         cancelRequest.groupId = groupId
+  //         cancelRequest.withdrawToken = openOrder.fromToken
+  //         cancelRequest.save()
+  //       }
+  //     }
+  //   }
+  // }
+  // else if(completedOrder) {
+  //   let groupId = completedOrder.groupId
+  //   let groupOrder = GroupOrder.load(groupId.toHex())
 
-        if(!withdrawRequest){
-          withdrawRequest = new WithdrawRequest(depositTxnHash.toHex())
-          withdrawRequest.account = account
-          withdrawRequest.amount = completedOrder.destAmount
-          withdrawRequest.groupId = groupId
-          withdrawRequest.withdrawToken = withdrawToken
-          withdrawRequest.save()
-        }
-      }
-    }
-  }
+  //   // withdraw request
+  //   if(groupOrder){
+  //     if (withdrawToken.toHex() == groupOrder.destToken.toHex()){
+  //       let withdrawRequest = WithdrawRequest.load(depositTxnHash.toHex())
+
+  //       if(!withdrawRequest){
+  //         withdrawRequest = new WithdrawRequest(depositTxnHash.toHex())
+  //         withdrawRequest.account = account
+  //         withdrawRequest.amount = completedOrder.destAmount
+  //         withdrawRequest.groupId = groupId
+  //         withdrawRequest.withdrawToken = withdrawToken
+  //         withdrawRequest.save()
+  //       }
+  //     }
+  //   }
+  // }
 }

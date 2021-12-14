@@ -69,7 +69,7 @@ test("handleDepositedToGroup - should handle new GroupOrder", () => {
       BigInt.fromI32(2),
   )
 
-  let contractAddress = Address.fromString("0x059D3E8320726ec827188fF76a8d6C08b6f9E774")
+  let contractAddress = Address.fromString("0x5101feD546FacccD309A77Ad755170f8fBf1E81D")
   let contractName    = "GroupSwap"
   let functionName    = "getGroup" 
   let functionSig     = "getGroup(address,address):(bytes32)"

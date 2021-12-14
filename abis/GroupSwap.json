@@ -101,9 +101,9 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "bytes",
+        "internalType": "bytes32",
         "name": "depositTxnHash",
-        "type": "bytes"
+        "type": "bytes32"
       },
       {
         "indexed": true,
@@ -335,19 +335,14 @@
         "type": "address"
       },
       {
-        "internalType": "bytes32",
-        "name": "group",
-        "type": "bytes32"
-      },
-      {
         "internalType": "uint192",
         "name": "amount",
         "type": "uint192"
       },
       {
-        "internalType": "bytes",
+        "internalType": "bytes32",
         "name": "depositTxnHash",
-        "type": "bytes"
+        "type": "bytes32"
       }
     ],
     "name": "requestWithdraw",

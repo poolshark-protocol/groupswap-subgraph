@@ -18,7 +18,7 @@ export function handleNewWithdrawRequested(events: WithdrawRequested[]): void {
   })
 }
 
-let contractAddress = Address.fromString("0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7")
+let contractAddress = Address.fromString("0x5101feD546FacccD309A77Ad755170f8fBf1E81D")
 let contract = GroupSwap.bind(contractAddress)
 
 export function createNewDepositedToGroupEvent(fromToken: string, destToken: string, user: string, amount: BigInt, userGas: BigInt): DepositedToGroup {
