@@ -4,12 +4,13 @@ import {
   GroupExecuted,
   WithdrawDeclined,
   WithdrawRequested,
-  WithdrawnFromGroupPost,
-  WithdrawnFromGroupPre,
   GroupSwap
 } from "../generated/PredaDex/GroupSwap"
 import { 
- GroupOrder, UserOrder, UserAccount
+  CancelledOrder,
+ CancelRequest,
+ WithdrawRequest,
+ GroupOrder, OpenOrder, UserAccount, CompletedOrder
 } from "../generated/schema"
 
 import { JSON } from "assemblyscript-json"; 
@@ -62,26 +63,31 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
 
   let groupAmounts: JSON.Obj = <JSON.Obj>JSON.parse(userEntity.groupAmounts)
   let groupAmountObj: JSON.Obj | null = groupAmounts.getObj(groupId.toHex())
-  let fromAmount: BigInt = BigInt.fromI32(0);
+  let newFromAmount: BigInt = BigInt.fromI32(0);
+
+  // create groupAmounts JSON object
+  let groupAmount = new JSON.Obj()
+  groupAmount.set("fromToken",fromToken.toHex())
+  groupAmount.set("destToken",destToken.toHex())
   
   // //if groupId exists
   if(groupAmountObj){
-    let groupAmount: JSON.Obj = <JSON.Obj>JSON.parse(groupAmountObj.valueOf())
-    let fromAmountStr: JSON.Str | null = groupAmount.getString("fromAmount")
+    let fromAmountStr: JSON.Value = groupAmountObj.valueOf().get("fromAmount")
+    let destAmountStr: JSON.Value = groupAmountObj.valueOf().get("destAmount")
+    //groupAmounts.set(groupId.toHex(), groupAmountObj.valueOf().get("fromAmount"))
+    // let fromAmountStr: JSON.Str | null = groupAmount.getString("fromAmount")
     if(fromAmountStr){
-      fromAmount = BigInt.fromString(JSON.parse(fromAmountStr.valueOf()).toString()).plus(depositAmount)
-      groupAmount.set("fromAmount", fromAmount.toString())
+      newFromAmount = BigInt.fromString(fromAmountStr.toString()).plus(depositAmount)
+      groupAmount.set("fromAmount", newFromAmount.toString())
+      groupAmount.set("destAmount", destAmountStr)
       groupAmounts.set(groupId.toHex(), groupAmount)
     }
   }
 
   //if groupId doesn't exist
   else{
-    let groupAmount = new JSON.Obj()
-    groupAmount.set("fromToken",fromToken.toHex())
-    groupAmount.set("destToken",destToken.toHex())
     groupAmount.set("fromAmount",depositAmount.toString())
-    groupAmount.set("destAmount",0)
+    groupAmount.set("destAmount","0")
     groupAmounts.set(groupId.toHex(),groupAmount)
   }
   
@@ -91,26 +97,72 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   userEntity.save()
 
   // OrderData
-  let orderEntity = new UserOrder(txnHash.toHex())
+  let orderEntity = new OpenOrder(txnHash.toHex())
 
-  orderEntity.gweiAdded  = userGas
-  orderEntity.fromToken  = fromToken
-  orderEntity.destToken  = destToken
-  orderEntity.fromAmount = depositAmount
-  orderEntity.account    = account
-
+  orderEntity.gweiAdded   = userGas
+  orderEntity.fromToken   = fromToken
+  orderEntity.destToken   = destToken
+  orderEntity.fromAmount  = depositAmount
+  orderEntity.account     = account
+  orderEntity.groupId     = groupId
+  orderEntity.block       = event.block.number
+  orderEntity.blockIndex  = event.transaction.index
   orderEntity.save()
 }
-export function handleGroupExecuted(event: GroupExecuted): void {}
+export function handleGroupExecuted(event: GroupExecuted): void {
+
+}
 
 export function handleWithdrawDeclined(event: WithdrawDeclined): void {}
 
-export function handleWithdrawRequested(event: WithdrawRequested): void {}
+export function handleWithdrawRequested(event: WithdrawRequested): void {
+  let account = event.params.user
+  let withdrawAmount = event.params.amount
+  let withdrawToken = event.params.withdrawToken
+  let depositTxnHash = event.params.depositTxnHash
 
-export function handleWithdrawnFromGroupPost(
-  event: WithdrawnFromGroupPost
-): void {}
+  //GroupData
+  let openOrder = OpenOrder.load(depositTxnHash.toHex())
+  let completedOrder = CompletedOrder.load(depositTxnHash.toHex())
 
-export function handleWithdrawnFromGroupPre(
-  event: WithdrawnFromGroupPre
-): void {}
+  if (openOrder) {
+    let groupId = openOrder.groupId
+    let groupOrder = GroupOrder.load(groupId.toHex())
+
+    // cancel request
+    if(groupOrder){
+      if(withdrawToken.toHex() == groupOrder.fromToken.toHex()){
+        let cancelRequest = CancelRequest.load(depositTxnHash.toHex())
+
+        if(!cancelRequest){
+          cancelRequest = new CancelRequest(depositTxnHash.toHex())
+          cancelRequest.account = account
+          cancelRequest.amount = openOrder.fromAmount
+          cancelRequest.groupId = groupId
+          cancelRequest.withdrawToken = openOrder.fromToken
+          cancelRequest.save()
+        }
+      }
+    }
+  }
+  else if(completedOrder) {
+    let groupId = completedOrder.groupId
+    let groupOrder = GroupOrder.load(groupId.toHex())
+
+    // withdraw request
+    if(groupOrder){
+      if (withdrawToken.toHex() == groupOrder.destToken.toHex()){
+        let withdrawRequest = WithdrawRequest.load(depositTxnHash.toHex())
+
+        if(!withdrawRequest){
+          withdrawRequest = new WithdrawRequest(depositTxnHash.toHex())
+          withdrawRequest.account = account
+          withdrawRequest.amount = completedOrder.destAmount
+          withdrawRequest.groupId = groupId
+          withdrawRequest.withdrawToken = withdrawToken
+          withdrawRequest.save()
+        }
+      }
+    }
+  }
+}

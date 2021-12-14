@@ -2,13 +2,19 @@ import { Address, ethereum, Bytes, BigInt, ByteArray} from "@graphprotocol/graph
 import { createMockedFunction, newMockEvent } from "matchstick-as/assembly/index"
 
 
-import { GroupOrder } from "../../generated/schema"
-import { DepositedToGroup, GroupSwap } from "../../generated/PredaDex/GroupSwap"
-import { handleDepositedToGroup } from "../../src/mapping"
+import { GroupOrder, WithdrawRequest } from "../../generated/schema"
+import { DepositedToGroup, GroupSwap, WithdrawRequested } from "../../generated/PredaDex/GroupSwap"
+import { handleDepositedToGroup, handleWithdrawRequested } from "../../src/mapping"
 
 export function handleNewDepositedToGroups(events: DepositedToGroup[]): void {
   events.forEach(event => {
       handleDepositedToGroup(event)
+  })
+}
+
+export function handleNewWithdrawRequested(events: WithdrawRequested[]): void {
+  events.forEach(event => {
+      handleWithdrawRequested(event)
   })
 }
 
@@ -32,4 +38,23 @@ export function createNewDepositedToGroupEvent(fromToken: string, destToken: str
     newDepositedToGroupEvent.parameters.push(userGasParam)
 
     return newDepositedToGroupEvent
+}
+
+export function createNewWithdrawRequestEvent(depositTxnHash: string, user: string, amount: BigInt, userGas: BigInt, withdrawToken: string ): WithdrawRequested {
+  let newWithdrawRequestEvent = changetype<WithdrawRequested>(newMockEvent())
+  newWithdrawRequestEvent.parameters = new Array()
+
+  let depositTxnHashParam = new ethereum.EventParam("depositTxnHash", ethereum.Value.fromBytes(Bytes.fromByteArray(ByteArray.fromHexString(depositTxnHash))))
+  let userParam = new ethereum.EventParam("user", ethereum.Value.fromAddress(Address.fromString(user)))
+  let amountParam = new ethereum.EventParam("amount", ethereum.Value.fromUnsignedBigInt(amount))
+  let userGasParam = new ethereum.EventParam("userGas", ethereum.Value.fromUnsignedBigInt(userGas))
+  let withdrawTokenParam = new ethereum.EventParam("withdrawTokenParam", ethereum.Value.fromAddress(Address.fromString(withdrawToken)))
+
+  newWithdrawRequestEvent.parameters.push(depositTxnHashParam)
+  newWithdrawRequestEvent.parameters.push(userParam)
+  newWithdrawRequestEvent.parameters.push(amountParam)
+  newWithdrawRequestEvent.parameters.push(userGasParam)
+  newWithdrawRequestEvent.parameters.push(withdrawTokenParam)
+
+  return newWithdrawRequestEvent
 }

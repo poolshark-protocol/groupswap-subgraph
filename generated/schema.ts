@@ -129,33 +129,36 @@ export class UserAccount extends Entity {
   }
 }
 
-export class UserOrder extends Entity {
+export class OpenOrder extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
     this.set("account", Value.fromBytes(Bytes.empty()));
+    this.set("groupId", Value.fromBytes(Bytes.empty()));
     this.set("fromToken", Value.fromBytes(Bytes.empty()));
     this.set("destToken", Value.fromBytes(Bytes.empty()));
     this.set("fromAmount", Value.fromBigInt(BigInt.zero()));
     this.set("gweiAdded", Value.fromBigInt(BigInt.zero()));
+    this.set("block", Value.fromBigInt(BigInt.zero()));
+    this.set("blockIndex", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save UserOrder entity without an ID");
+    assert(id != null, "Cannot save OpenOrder entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save UserOrder entity with non-string ID. " +
+        "Cannot save OpenOrder entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("UserOrder", id.toString(), this);
+      store.set("OpenOrder", id.toString(), this);
     }
   }
 
-  static load(id: string): UserOrder | null {
-    return changetype<UserOrder | null>(store.get("UserOrder", id));
+  static load(id: string): OpenOrder | null {
+    return changetype<OpenOrder | null>(store.get("OpenOrder", id));
   }
 
   get id(): string {
@@ -174,6 +177,15 @@ export class UserOrder extends Entity {
 
   set account(value: Bytes) {
     this.set("account", Value.fromBytes(value));
+  }
+
+  get groupId(): Bytes {
+    let value = this.get("groupId");
+    return value!.toBytes();
+  }
+
+  set groupId(value: Bytes) {
+    this.set("groupId", Value.fromBytes(value));
   }
 
   get fromToken(): Bytes {
@@ -210,6 +222,286 @@ export class UserOrder extends Entity {
 
   set gweiAdded(value: BigInt) {
     this.set("gweiAdded", Value.fromBigInt(value));
+  }
+
+  get block(): BigInt {
+    let value = this.get("block");
+    return value!.toBigInt();
+  }
+
+  set block(value: BigInt) {
+    this.set("block", Value.fromBigInt(value));
+  }
+
+  get blockIndex(): BigInt {
+    let value = this.get("blockIndex");
+    return value!.toBigInt();
+  }
+
+  set blockIndex(value: BigInt) {
+    this.set("blockIndex", Value.fromBigInt(value));
+  }
+}
+
+export class ExecutedOrder extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("account", Value.fromBytes(Bytes.empty()));
+    this.set("groupId", Value.fromBytes(Bytes.empty()));
+    this.set("fromToken", Value.fromBytes(Bytes.empty()));
+    this.set("destToken", Value.fromBytes(Bytes.empty()));
+    this.set("destAmount", Value.fromBigInt(BigInt.zero()));
+    this.set("groupTxnHash", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save ExecutedOrder entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save ExecutedOrder entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("ExecutedOrder", id.toString(), this);
+    }
+  }
+
+  static load(id: string): ExecutedOrder | null {
+    return changetype<ExecutedOrder | null>(store.get("ExecutedOrder", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
+  }
+
+  get groupId(): Bytes {
+    let value = this.get("groupId");
+    return value!.toBytes();
+  }
+
+  set groupId(value: Bytes) {
+    this.set("groupId", Value.fromBytes(value));
+  }
+
+  get fromToken(): Bytes {
+    let value = this.get("fromToken");
+    return value!.toBytes();
+  }
+
+  set fromToken(value: Bytes) {
+    this.set("fromToken", Value.fromBytes(value));
+  }
+
+  get destToken(): Bytes {
+    let value = this.get("destToken");
+    return value!.toBytes();
+  }
+
+  set destToken(value: Bytes) {
+    this.set("destToken", Value.fromBytes(value));
+  }
+
+  get destAmount(): BigInt {
+    let value = this.get("destAmount");
+    return value!.toBigInt();
+  }
+
+  set destAmount(value: BigInt) {
+    this.set("destAmount", Value.fromBigInt(value));
+  }
+
+  get groupTxnHash(): BigInt {
+    let value = this.get("groupTxnHash");
+    return value!.toBigInt();
+  }
+
+  set groupTxnHash(value: BigInt) {
+    this.set("groupTxnHash", Value.fromBigInt(value));
+  }
+}
+
+export class CancelledOrder extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("account", Value.fromBytes(Bytes.empty()));
+    this.set("groupId", Value.fromBytes(Bytes.empty()));
+    this.set("fromToken", Value.fromBytes(Bytes.empty()));
+    this.set("destToken", Value.fromBytes(Bytes.empty()));
+    this.set("fromAmount", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save CancelledOrder entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save CancelledOrder entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("CancelledOrder", id.toString(), this);
+    }
+  }
+
+  static load(id: string): CancelledOrder | null {
+    return changetype<CancelledOrder | null>(store.get("CancelledOrder", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
+  }
+
+  get groupId(): Bytes {
+    let value = this.get("groupId");
+    return value!.toBytes();
+  }
+
+  set groupId(value: Bytes) {
+    this.set("groupId", Value.fromBytes(value));
+  }
+
+  get fromToken(): Bytes {
+    let value = this.get("fromToken");
+    return value!.toBytes();
+  }
+
+  set fromToken(value: Bytes) {
+    this.set("fromToken", Value.fromBytes(value));
+  }
+
+  get destToken(): Bytes {
+    let value = this.get("destToken");
+    return value!.toBytes();
+  }
+
+  set destToken(value: Bytes) {
+    this.set("destToken", Value.fromBytes(value));
+  }
+
+  get fromAmount(): BigInt {
+    let value = this.get("fromAmount");
+    return value!.toBigInt();
+  }
+
+  set fromAmount(value: BigInt) {
+    this.set("fromAmount", Value.fromBigInt(value));
+  }
+}
+
+export class CompletedOrder extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("account", Value.fromBytes(Bytes.empty()));
+    this.set("groupId", Value.fromBytes(Bytes.empty()));
+    this.set("fromToken", Value.fromBytes(Bytes.empty()));
+    this.set("destToken", Value.fromBytes(Bytes.empty()));
+    this.set("destAmount", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save CompletedOrder entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save CompletedOrder entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("CompletedOrder", id.toString(), this);
+    }
+  }
+
+  static load(id: string): CompletedOrder | null {
+    return changetype<CompletedOrder | null>(store.get("CompletedOrder", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
+  }
+
+  get groupId(): Bytes {
+    let value = this.get("groupId");
+    return value!.toBytes();
+  }
+
+  set groupId(value: Bytes) {
+    this.set("groupId", Value.fromBytes(value));
+  }
+
+  get fromToken(): Bytes {
+    let value = this.get("fromToken");
+    return value!.toBytes();
+  }
+
+  set fromToken(value: Bytes) {
+    this.set("fromToken", Value.fromBytes(value));
+  }
+
+  get destToken(): Bytes {
+    let value = this.get("destToken");
+    return value!.toBytes();
+  }
+
+  set destToken(value: Bytes) {
+    this.set("destToken", Value.fromBytes(value));
+  }
+
+  get destAmount(): BigInt {
+    let value = this.get("destAmount");
+    return value!.toBigInt();
+  }
+
+  set destAmount(value: BigInt) {
+    this.set("destAmount", Value.fromBigInt(value));
   }
 }
 
@@ -277,14 +569,89 @@ export class GroupExecuted extends Entity {
   }
 }
 
+export class CancelRequest extends Entity {
+  constructor(id: string) {
+    super();
+    this.set("id", Value.fromString(id));
+
+    this.set("account", Value.fromBytes(Bytes.empty()));
+    this.set("groupId", Value.fromBytes(Bytes.empty()));
+    this.set("withdrawToken", Value.fromBytes(Bytes.empty()));
+    this.set("amount", Value.fromBigInt(BigInt.zero()));
+  }
+
+  save(): void {
+    let id = this.get("id");
+    assert(id != null, "Cannot save CancelRequest entity without an ID");
+    if (id) {
+      assert(
+        id.kind == ValueKind.STRING,
+        "Cannot save CancelRequest entity with non-string ID. " +
+          'Considering using .toHex() to convert the "id" to a string.'
+      );
+      store.set("CancelRequest", id.toString(), this);
+    }
+  }
+
+  static load(id: string): CancelRequest | null {
+    return changetype<CancelRequest | null>(store.get("CancelRequest", id));
+  }
+
+  get id(): string {
+    let value = this.get("id");
+    return value!.toString();
+  }
+
+  set id(value: string) {
+    this.set("id", Value.fromString(value));
+  }
+
+  get account(): Bytes {
+    let value = this.get("account");
+    return value!.toBytes();
+  }
+
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
+  }
+
+  get groupId(): Bytes {
+    let value = this.get("groupId");
+    return value!.toBytes();
+  }
+
+  set groupId(value: Bytes) {
+    this.set("groupId", Value.fromBytes(value));
+  }
+
+  get withdrawToken(): Bytes {
+    let value = this.get("withdrawToken");
+    return value!.toBytes();
+  }
+
+  set withdrawToken(value: Bytes) {
+    this.set("withdrawToken", Value.fromBytes(value));
+  }
+
+  get amount(): BigInt {
+    let value = this.get("amount");
+    return value!.toBigInt();
+  }
+
+  set amount(value: BigInt) {
+    this.set("amount", Value.fromBigInt(value));
+  }
+}
+
 export class WithdrawRequest extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
-    this.set("address", Value.fromBytes(Bytes.empty()));
-    this.set("groupIds", Value.fromBytesArray(new Array(0)));
-    this.set("amounts", Value.fromBigIntArray(new Array(0)));
+    this.set("account", Value.fromBytes(Bytes.empty()));
+    this.set("groupId", Value.fromBytes(Bytes.empty()));
+    this.set("withdrawToken", Value.fromBytes(Bytes.empty()));
+    this.set("amount", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -313,31 +680,40 @@ export class WithdrawRequest extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get address(): Bytes {
-    let value = this.get("address");
+  get account(): Bytes {
+    let value = this.get("account");
     return value!.toBytes();
   }
 
-  set address(value: Bytes) {
-    this.set("address", Value.fromBytes(value));
+  set account(value: Bytes) {
+    this.set("account", Value.fromBytes(value));
   }
 
-  get groupIds(): Array<Bytes> {
-    let value = this.get("groupIds");
-    return value!.toBytesArray();
+  get groupId(): Bytes {
+    let value = this.get("groupId");
+    return value!.toBytes();
   }
 
-  set groupIds(value: Array<Bytes>) {
-    this.set("groupIds", Value.fromBytesArray(value));
+  set groupId(value: Bytes) {
+    this.set("groupId", Value.fromBytes(value));
   }
 
-  get amounts(): Array<BigInt> {
-    let value = this.get("amounts");
-    return value!.toBigIntArray();
+  get withdrawToken(): Bytes {
+    let value = this.get("withdrawToken");
+    return value!.toBytes();
   }
 
-  set amounts(value: Array<BigInt>) {
-    this.set("amounts", Value.fromBigIntArray(value));
+  set withdrawToken(value: Bytes) {
+    this.set("withdrawToken", Value.fromBytes(value));
+  }
+
+  get amount(): BigInt {
+    let value = this.get("amount");
+    return value!.toBigInt();
+  }
+
+  set amount(value: BigInt) {
+    this.set("amount", Value.fromBigInt(value));
   }
 }
 

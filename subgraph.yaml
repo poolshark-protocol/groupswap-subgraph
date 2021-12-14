@@ -8,7 +8,7 @@ dataSources:
     name: PredaDex
     network: rinkeby
     source:
-      address: '0x059D3E8320726ec827188fF76a8d6C08b6f9E774'
+      address: '0x3B61b2A6dafC3dCbb11B6F76Fc2903e76D190577'
       abi: GroupSwap
       startBlock:  9788000
     mapping:
@@ -29,7 +29,7 @@ dataSources:
       eventHandlers:
         - event: DepositedToGroup(indexed address,indexed address,indexed address,uint192,uint64)
           handler: handleDepositedToGroup
-        - event: WithdrawRequested(indexed bytes32,indexed address,uint192,uint64,address)
+        - event: WithdrawRequested(indexed bytes,indexed address,uint192,uint64,address)
           handler: handleWithdrawRequested
         - event: WithdrawDeclined(indexed bytes32,indexed address,address)
           handler: handleWithdrawDeclined

@@ -101,9 +101,9 @@
     "inputs": [
       {
         "indexed": true,
-        "internalType": "bytes32",
-        "name": "groupId",
-        "type": "bytes32"
+        "internalType": "bytes",
+        "name": "depositTxnHash",
+        "type": "bytes"
       },
       {
         "indexed": true,
@@ -272,6 +272,11 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "gasPrice",
+        "type": "uint64"
       }
     ],
     "name": "estimateGasRequirements",
@@ -338,6 +343,11 @@
         "internalType": "uint192",
         "name": "amount",
         "type": "uint192"
+      },
+      {
+        "internalType": "bytes",
+        "name": "depositTxnHash",
+        "type": "bytes"
       }
     ],
     "name": "requestWithdraw",

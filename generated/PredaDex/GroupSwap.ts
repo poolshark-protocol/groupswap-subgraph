@@ -105,7 +105,7 @@ export class WithdrawRequested__Params {
     this._event = event;
   }
 
-  get groupId(): Bytes {
+  get depositTxnHash(): Bytes {
     return this._event.parameters[0].value.toBytes();
   }
 
@@ -186,15 +186,17 @@ export class GroupSwap extends ethereum.SmartContract {
   estimateGasRequirements(
     fromToken: Address,
     destToken: Address,
-    amount: BigInt
+    amount: BigInt,
+    gasPrice: BigInt
   ): BigInt {
     let result = super.call(
       "estimateGasRequirements",
-      "estimateGasRequirements(address,address,uint256):(uint256)",
+      "estimateGasRequirements(address,address,uint256,uint64):(uint256)",
       [
         ethereum.Value.fromAddress(fromToken),
         ethereum.Value.fromAddress(destToken),
-        ethereum.Value.fromUnsignedBigInt(amount)
+        ethereum.Value.fromUnsignedBigInt(amount),
+        ethereum.Value.fromUnsignedBigInt(gasPrice)
       ]
     );
 
@@ -204,15 +206,17 @@ export class GroupSwap extends ethereum.SmartContract {
   try_estimateGasRequirements(
     fromToken: Address,
     destToken: Address,
-    amount: BigInt
+    amount: BigInt,
+    gasPrice: BigInt
   ): ethereum.CallResult<BigInt> {
     let result = super.tryCall(
       "estimateGasRequirements",
-      "estimateGasRequirements(address,address,uint256):(uint256)",
+      "estimateGasRequirements(address,address,uint256,uint64):(uint256)",
       [
         ethereum.Value.fromAddress(fromToken),
         ethereum.Value.fromAddress(destToken),
-        ethereum.Value.fromUnsignedBigInt(amount)
+        ethereum.Value.fromUnsignedBigInt(amount),
+        ethereum.Value.fromUnsignedBigInt(gasPrice)
       ]
     );
     if (result.reverted) {
@@ -482,6 +486,10 @@ export class RequestWithdrawCall__Inputs {
 
   get amount(): BigInt {
     return this._call.inputValues[2].value.toBigInt();
+  }
+
+  get depositTxnHash(): Bytes {
+    return this._call.inputValues[3].value.toBytes();
   }
 }
 
