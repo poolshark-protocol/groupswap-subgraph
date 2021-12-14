@@ -74,9 +74,11 @@ test("handleDepositedToGroup - should handle new CancelRequest", () => {
     "0xa16081f360e3847006db660bae1c6d1b2e17ec2a" 
   )
 
+  logStore()
+
     // Call mappings
   let newWithdrawRequestedEvent = createNewWithdrawRequestEvent(
-      "0xbcb55f6655dc8ec543b0349004fb2f9da2553c885d1787f5eb3f4356be079126",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
       "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
       BigInt.fromI32(1),
       BigInt.fromI32(2),
@@ -85,14 +87,16 @@ test("handleDepositedToGroup - should handle new CancelRequest", () => {
 
   handleNewWithdrawRequested([newWithdrawRequestedEvent])
 
+  logStore()
+
   assert.fieldEquals(
       CANCELREQUEST_ENTITY_TYPE,
-      "0xbcb55f6655dc8ec543b0349004fb2f9da2553c885d1787f5eb3f4356be079126",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
       "id",
-      "0xbcb55f6655dc8ec543b0349004fb2f9da2553c885d1787f5eb3f4356be079126"
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a"
   )
   
-  logStore()
+  
 
   // assert.fieldEquals(
   //   GROUPORDER_ENTITY_TYPE,
