@@ -6,9 +6,9 @@ import { GroupSwap } from "../../generated/PredaDex/GroupSwap"
 import {
     WithdrawRequested
   } from "../../generated/PredaDex/GroupSwap"
-import { createNewDepositedToGroupEvent, createNewWithdrawRequestEvent, handleNewWithdrawRequested, handleNewDepositedToGroups} from "./utils"
+import { createNewDepositedToGroupEvent, createNewWithdrawRequestEvent, handleNewWithdrawRequested, handleNewDepositedToGroups, createNewGroupExecutedEvent} from "./utils"
 import { JSON } from "assemblyscript-json"; 
-import { handleWithdrawRequested } from "../../src/mapping"
+import { handleGroupExecuted, handleWithdrawRequested } from "../../src/mappings/groupswap"
 
 let CANCELREQUEST_ENTITY_TYPE  = "CancelRequest"
 let WITHDRAWREQUEST_ENTITY_TYPE = "WithdrawRequest"
@@ -74,7 +74,7 @@ test("handleDepositedToGroup - should handle new CancelRequest", () => {
     "0xa16081f360e3847006db660bae1c6d1b2e17ec2a" 
   )
 
-  logStore()
+  //logStore()
 
     // Call mappings
   let newWithdrawRequestedEvent = createNewWithdrawRequestEvent(
@@ -87,30 +87,111 @@ test("handleDepositedToGroup - should handle new CancelRequest", () => {
 
   handleNewWithdrawRequested([newWithdrawRequestedEvent])
 
-  logStore()
+  //logStore()
 
   assert.fieldEquals(
       CANCELREQUEST_ENTITY_TYPE,
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
-      "id",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a"
+      "groupId",
+      "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e"
   )
-  
-  
 
-  // assert.fieldEquals(
-  //   GROUPORDER_ENTITY_TYPE,
-  //   "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e",
-  //   "groupAmount",
-  //   "1"
-  // )
+  assert.fieldEquals(
+    CANCELREQUEST_ENTITY_TYPE,
+    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "withdrawToken",
+    "0x6b175474e89094c44da98b954eedeac495271d0f"
+  )
 
-  // assert.fieldEquals(
-  //   GROUPORDER_ENTITY_TYPE,
-  //   "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e",
-  //   "groupGwei",
-  //   "2"
-  // )
+  assert.fieldEquals(
+    CANCELREQUEST_ENTITY_TYPE,
+    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "account",
+    "0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7"
+  )
+
+  assert.fieldEquals(
+    CANCELREQUEST_ENTITY_TYPE,
+    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "amount",
+    "1"
+  )
 
   clearStore()
 })
+
+test("handleDepositedToGroup - should handle new WithdrawRequest", () => {
+
+  // Call mappings
+  let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
+      "0x6b175474e89094c44da98b954eedeac495271d0f",
+      "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+      "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
+      BigInt.fromI32(1),
+      BigInt.fromI32(2)
+  )
+
+  handleNewDepositedToGroups([newDepositedToGroupEvent])
+
+  //logStore()
+
+  assert.fieldEquals(
+    USERORDER_ENTITY_TYPE, "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "id",
+    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a"
+  )
+
+  let newGroupExecutedEvent = createNewGroupExecutedEvent(
+    "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e",
+    BigInt.fromI32(1)
+  )
+
+  handleGroupExecuted(newGroupExecutedEvent)
+
+  logStore()
+
+    // Call mappings
+  let newWithdrawRequestedEvent = createNewWithdrawRequestEvent(
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+      "0x89205A3A3b2A69De6Dbf7f01ED13B2108B2c43e7",
+      BigInt.fromI32(1),
+      BigInt.fromI32(2),
+      "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48"
+  )
+
+  handleNewWithdrawRequested([newWithdrawRequestedEvent])
+
+  //logStore()
+
+  assert.fieldEquals(
+    WITHDRAWREQUEST_ENTITY_TYPE,
+    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "groupId",
+    "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e"
+  )
+
+  assert.fieldEquals(
+    WITHDRAWREQUEST_ENTITY_TYPE,
+    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "withdrawToken",
+    "0x6b175474e89094c44da98b954eedeac495271d0f"
+  )
+
+  assert.fieldEquals(
+    WITHDRAWREQUEST_ENTITY_TYPE,
+    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "account",
+    "0x89205a3a3b2a69de6dbf7f01ed13b2108b2c43e7"
+  )
+
+  assert.fieldEquals(
+    WITHDRAWREQUEST_ENTITY_TYPE,
+    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "amount",
+    "1"
+  )
+
+  clearStore()
+})
+
+

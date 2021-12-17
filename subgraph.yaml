@@ -1,4 +1,4 @@
-specVersion: 0.0.2
+specVersion: 0.0.3
 description: PredaDex for Ethereum
 repository: https://github.com/PoolSharks-Protocol/swap-rollups-subgraph
 schema:
@@ -19,7 +19,7 @@ dataSources:
         - UserData
         - GroupData
         - OrderData
-        - GroupExecuted
+        - GroupExecution
         - WithdrawRequest
         - WithdrawApproved
         - WithdrawDeclined
@@ -39,4 +39,4 @@ dataSources:
           handler: handleWithdrawFromGroupPost
         - event: GroupExecuted(indexed bytes32,uint256)
           handler: handleGroupExecuted
-      file: ./src/mapping.ts
+      file: ./src/mappings/groupswap.ts

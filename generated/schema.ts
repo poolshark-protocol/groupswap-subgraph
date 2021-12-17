@@ -20,6 +20,7 @@ export class GroupOrder extends Entity {
     this.set("groupGwei", Value.fromBigInt(BigInt.zero()));
     this.set("fromToken", Value.fromBytes(Bytes.empty()));
     this.set("destToken", Value.fromBytes(Bytes.empty()));
+    this.set("orderTxnHashes", Value.fromBytesArray(new Array(0)));
   }
 
   save(): void {
@@ -82,6 +83,15 @@ export class GroupOrder extends Entity {
 
   set destToken(value: Bytes) {
     this.set("destToken", Value.fromBytes(value));
+  }
+
+  get orderTxnHashes(): Array<Bytes> {
+    let value = this.get("orderTxnHashes");
+    return value!.toBytesArray();
+  }
+
+  set orderTxnHashes(value: Array<Bytes>) {
+    this.set("orderTxnHashes", Value.fromBytesArray(value));
   }
 }
 
@@ -343,7 +353,6 @@ export class CancelledOrder extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("account", Value.fromBytes(Bytes.empty()));
-    this.set("groupId", Value.fromBytes(Bytes.empty()));
     this.set("fromToken", Value.fromBytes(Bytes.empty()));
     this.set("destToken", Value.fromBytes(Bytes.empty()));
     this.set("fromAmount", Value.fromBigInt(BigInt.zero()));
@@ -384,15 +393,6 @@ export class CancelledOrder extends Entity {
     this.set("account", Value.fromBytes(value));
   }
 
-  get groupId(): Bytes {
-    let value = this.get("groupId");
-    return value!.toBytes();
-  }
-
-  set groupId(value: Bytes) {
-    this.set("groupId", Value.fromBytes(value));
-  }
-
   get fromToken(): Bytes {
     let value = this.get("fromToken");
     return value!.toBytes();
@@ -427,10 +427,10 @@ export class CompletedOrder extends Entity {
     this.set("id", Value.fromString(id));
 
     this.set("account", Value.fromBytes(Bytes.empty()));
-    this.set("groupId", Value.fromBytes(Bytes.empty()));
     this.set("fromToken", Value.fromBytes(Bytes.empty()));
     this.set("destToken", Value.fromBytes(Bytes.empty()));
     this.set("destAmount", Value.fromBigInt(BigInt.zero()));
+    this.set("groupTxnHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -468,15 +468,6 @@ export class CompletedOrder extends Entity {
     this.set("account", Value.fromBytes(value));
   }
 
-  get groupId(): Bytes {
-    let value = this.get("groupId");
-    return value!.toBytes();
-  }
-
-  set groupId(value: Bytes) {
-    this.set("groupId", Value.fromBytes(value));
-  }
-
   get fromToken(): Bytes {
     let value = this.get("fromToken");
     return value!.toBytes();
@@ -503,33 +494,45 @@ export class CompletedOrder extends Entity {
   set destAmount(value: BigInt) {
     this.set("destAmount", Value.fromBigInt(value));
   }
+
+  get groupTxnHash(): Bytes {
+    let value = this.get("groupTxnHash");
+    return value!.toBytes();
+  }
+
+  set groupTxnHash(value: Bytes) {
+    this.set("groupTxnHash", Value.fromBytes(value));
+  }
 }
 
-export class GroupExecuted extends Entity {
+export class GroupExecution extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
 
     this.set("groupId", Value.fromBytes(Bytes.empty()));
+    this.set("inputAmount", Value.fromBigInt(BigInt.zero()));
     this.set("returnAmount", Value.fromBigInt(BigInt.zero()));
     this.set("usedGas", Value.fromBigInt(BigInt.zero()));
+    this.set("txnHash", Value.fromBytes(Bytes.empty()));
+    this.set("compltdTxnHashes", Value.fromBytesArray(new Array(0)));
   }
 
   save(): void {
     let id = this.get("id");
-    assert(id != null, "Cannot save GroupExecuted entity without an ID");
+    assert(id != null, "Cannot save GroupExecution entity without an ID");
     if (id) {
       assert(
         id.kind == ValueKind.STRING,
-        "Cannot save GroupExecuted entity with non-string ID. " +
+        "Cannot save GroupExecution entity with non-string ID. " +
           'Considering using .toHex() to convert the "id" to a string.'
       );
-      store.set("GroupExecuted", id.toString(), this);
+      store.set("GroupExecution", id.toString(), this);
     }
   }
 
-  static load(id: string): GroupExecuted | null {
-    return changetype<GroupExecuted | null>(store.get("GroupExecuted", id));
+  static load(id: string): GroupExecution | null {
+    return changetype<GroupExecution | null>(store.get("GroupExecution", id));
   }
 
   get id(): string {
@@ -550,6 +553,15 @@ export class GroupExecuted extends Entity {
     this.set("groupId", Value.fromBytes(value));
   }
 
+  get inputAmount(): BigInt {
+    let value = this.get("inputAmount");
+    return value!.toBigInt();
+  }
+
+  set inputAmount(value: BigInt) {
+    this.set("inputAmount", Value.fromBigInt(value));
+  }
+
   get returnAmount(): BigInt {
     let value = this.get("returnAmount");
     return value!.toBigInt();
@@ -566,6 +578,24 @@ export class GroupExecuted extends Entity {
 
   set usedGas(value: BigInt) {
     this.set("usedGas", Value.fromBigInt(value));
+  }
+
+  get txnHash(): Bytes {
+    let value = this.get("txnHash");
+    return value!.toBytes();
+  }
+
+  set txnHash(value: Bytes) {
+    this.set("txnHash", Value.fromBytes(value));
+  }
+
+  get compltdTxnHashes(): Array<Bytes> {
+    let value = this.get("compltdTxnHashes");
+    return value!.toBytesArray();
+  }
+
+  set compltdTxnHashes(value: Array<Bytes>) {
+    this.set("compltdTxnHashes", Value.fromBytesArray(value));
   }
 }
 

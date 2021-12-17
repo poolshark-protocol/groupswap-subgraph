@@ -2,9 +2,9 @@ import { Address, ethereum, Bytes, BigInt, ByteArray} from "@graphprotocol/graph
 import { createMockedFunction, newMockEvent } from "matchstick-as/assembly/index"
 
 
-import { GroupOrder, WithdrawRequest } from "../../generated/schema"
-import { DepositedToGroup, GroupSwap, WithdrawRequested } from "../../generated/PredaDex/GroupSwap"
-import { handleDepositedToGroup, handleWithdrawRequested } from "../../src/mapping"
+import { GroupExecution, GroupOrder, WithdrawRequest } from "../../generated/schema"
+import { DepositedToGroup, GroupExecuted, GroupSwap, WithdrawRequested } from "../../generated/PredaDex/GroupSwap"
+import { handleDepositedToGroup, handleGroupExecuted, handleWithdrawRequested } from "../../src/mappings/groupswap"
 
 export function handleNewDepositedToGroups(events: DepositedToGroup[]): void {
   events.forEach(event => {
@@ -15,6 +15,12 @@ export function handleNewDepositedToGroups(events: DepositedToGroup[]): void {
 export function handleNewWithdrawRequested(events: WithdrawRequested[]): void {
   events.forEach(event => {
       handleWithdrawRequested(event)
+  })
+}
+
+export function handleNewGroupExecuted(events: GroupExecuted[]): void {
+  events.forEach(event => {
+      handleGroupExecuted(event)
   })
 }
 
@@ -38,6 +44,19 @@ export function createNewDepositedToGroupEvent(fromToken: string, destToken: str
     newDepositedToGroupEvent.parameters.push(userGasParam)
 
     return newDepositedToGroupEvent
+}
+
+export function createNewGroupExecutedEvent(groupId: string, returnAmount: BigInt ): GroupExecuted {
+  let newGroupExecutedEvent = changetype<GroupExecuted>(newMockEvent())
+  newGroupExecutedEvent.parameters = new Array()
+
+  let groupIdParam = new ethereum.EventParam("groupId", ethereum.Value.fromBytes(Bytes.fromByteArray(ByteArray.fromHexString(groupId))))
+  let returnAmountParam = new ethereum.EventParam("returnAmount", ethereum.Value.fromUnsignedBigInt(returnAmount))
+  
+  newGroupExecutedEvent.parameters.push(groupIdParam)
+  newGroupExecutedEvent.parameters.push(returnAmountParam)
+
+  return newGroupExecutedEvent
 }
 
 export function createNewWithdrawRequestEvent(depositTxnHash: string, user: string, amount: BigInt, userGas: BigInt, withdrawToken: string ): WithdrawRequested {

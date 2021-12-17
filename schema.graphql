@@ -1,9 +1,10 @@
 type GroupOrder @entity {
-  id:          ID!
-  groupAmount: BigInt!
-  groupGwei:   BigInt!
-  fromToken:   Bytes!
-  destToken:   Bytes!
+  id:              ID!
+  groupAmount:     BigInt!
+  groupGwei:       BigInt!
+  fromToken:       Bytes!
+  destToken:       Bytes!
+  orderTxnHashes:  [Bytes!]!
 }
 
 type UserAccount @entity {
@@ -36,7 +37,6 @@ type ExecutedOrder @entity {
 type CancelledOrder @entity {
   id:           ID!
   account:      Bytes!
-  groupId:      Bytes!
   fromToken:    Bytes!
   destToken:    Bytes!
   fromAmount:   BigInt!
@@ -45,17 +45,20 @@ type CancelledOrder @entity {
 type CompletedOrder @entity {
   id:           ID!
   account:      Bytes!
-  groupId:      Bytes!
   fromToken:    Bytes!
   destToken:    Bytes!
   destAmount:   BigInt!
+  groupTxnHash: Bytes!
 }
 
-type GroupExecuted @entity {
-  id:           ID!
-  groupId:      Bytes!
-  returnAmount: BigInt!
-  usedGas:      BigInt!
+type GroupExecution @entity {
+  id:                ID!
+  groupId:           Bytes!
+  inputAmount:       BigInt!
+  returnAmount:      BigInt!
+  usedGas:           BigInt!
+  txnHash:           Bytes!
+  compltdTxnHashes: [Bytes!]!
 }
 
 type CancelRequest @entity {
