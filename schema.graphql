@@ -20,7 +20,7 @@ type OpenOrder @entity {
   destToken:    Bytes!
   fromAmount:   BigInt!
   gweiAdded:    BigInt!
-  block:        BigInt!
+  blockNumber:  BigInt!
   blockIndex:   BigInt!
 }
 
@@ -31,15 +31,21 @@ type ExecutedOrder @entity {
   fromToken:    Bytes!
   destToken:    Bytes!
   destAmount:   BigInt!
+  gweiLeft:     BigInt!
   groupTxnHash: BigInt!
+  blockNumber:  BigInt!
+  blockIndex:   BigInt!
 }
 
 type CancelledOrder @entity {
-  id:           ID!
-  account:      Bytes!
-  fromToken:    Bytes!
-  destToken:    Bytes!
-  fromAmount:   BigInt!
+  id:              ID!
+  account:         Bytes!
+  fromToken:       Bytes!
+  destToken:       Bytes!
+  depositTxnHash:  Bytes!
+  withdrawTxnHash: Bytes!
+  transferTxnHash: Bytes!
+  fromAmount:      BigInt!
 }
 
 type CompletedOrder @entity {
@@ -56,9 +62,12 @@ type GroupExecution @entity {
   groupId:           Bytes!
   inputAmount:       BigInt!
   returnAmount:      BigInt!
+  returnAmountLeft:  BigInt!
   usedGas:           BigInt!
   txnHash:           Bytes!
   compltdTxnHashes: [Bytes!]!
+  blockNumber:       BigInt!
+  blockIndex:        BigInt!
 }
 
 type CancelRequest @entity {
@@ -70,11 +79,13 @@ type CancelRequest @entity {
 }
 
 type WithdrawRequest @entity {
-  id:            ID!
-  account:       Bytes!
-  groupId:       Bytes!
-  withdrawToken: Bytes! 
-  amount:        BigInt!
+  id:              ID!
+  account:         Bytes!
+  groupId:         Bytes!
+  withdrawToken:   Bytes! 
+  amount:          BigInt!
+  groupTxnHash:    Bytes!
+  withdrawTxnHash: Bytes!
 }
 
 type WithdrawApproved @entity {

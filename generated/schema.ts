@@ -150,7 +150,7 @@ export class OpenOrder extends Entity {
     this.set("destToken", Value.fromBytes(Bytes.empty()));
     this.set("fromAmount", Value.fromBigInt(BigInt.zero()));
     this.set("gweiAdded", Value.fromBigInt(BigInt.zero()));
-    this.set("block", Value.fromBigInt(BigInt.zero()));
+    this.set("blockNumber", Value.fromBigInt(BigInt.zero()));
     this.set("blockIndex", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -234,13 +234,13 @@ export class OpenOrder extends Entity {
     this.set("gweiAdded", Value.fromBigInt(value));
   }
 
-  get block(): BigInt {
-    let value = this.get("block");
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
     return value!.toBigInt();
   }
 
-  set block(value: BigInt) {
-    this.set("block", Value.fromBigInt(value));
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
   }
 
   get blockIndex(): BigInt {
@@ -263,7 +263,10 @@ export class ExecutedOrder extends Entity {
     this.set("fromToken", Value.fromBytes(Bytes.empty()));
     this.set("destToken", Value.fromBytes(Bytes.empty()));
     this.set("destAmount", Value.fromBigInt(BigInt.zero()));
+    this.set("gweiLeft", Value.fromBigInt(BigInt.zero()));
     this.set("groupTxnHash", Value.fromBigInt(BigInt.zero()));
+    this.set("blockNumber", Value.fromBigInt(BigInt.zero()));
+    this.set("blockIndex", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -337,6 +340,15 @@ export class ExecutedOrder extends Entity {
     this.set("destAmount", Value.fromBigInt(value));
   }
 
+  get gweiLeft(): BigInt {
+    let value = this.get("gweiLeft");
+    return value!.toBigInt();
+  }
+
+  set gweiLeft(value: BigInt) {
+    this.set("gweiLeft", Value.fromBigInt(value));
+  }
+
   get groupTxnHash(): BigInt {
     let value = this.get("groupTxnHash");
     return value!.toBigInt();
@@ -344,6 +356,24 @@ export class ExecutedOrder extends Entity {
 
   set groupTxnHash(value: BigInt) {
     this.set("groupTxnHash", Value.fromBigInt(value));
+  }
+
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
+    return value!.toBigInt();
+  }
+
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
+  }
+
+  get blockIndex(): BigInt {
+    let value = this.get("blockIndex");
+    return value!.toBigInt();
+  }
+
+  set blockIndex(value: BigInt) {
+    this.set("blockIndex", Value.fromBigInt(value));
   }
 }
 
@@ -355,6 +385,9 @@ export class CancelledOrder extends Entity {
     this.set("account", Value.fromBytes(Bytes.empty()));
     this.set("fromToken", Value.fromBytes(Bytes.empty()));
     this.set("destToken", Value.fromBytes(Bytes.empty()));
+    this.set("depositTxnHash", Value.fromBytes(Bytes.empty()));
+    this.set("withdrawTxnHash", Value.fromBytes(Bytes.empty()));
+    this.set("transferTxnHash", Value.fromBytes(Bytes.empty()));
     this.set("fromAmount", Value.fromBigInt(BigInt.zero()));
   }
 
@@ -409,6 +442,33 @@ export class CancelledOrder extends Entity {
 
   set destToken(value: Bytes) {
     this.set("destToken", Value.fromBytes(value));
+  }
+
+  get depositTxnHash(): Bytes {
+    let value = this.get("depositTxnHash");
+    return value!.toBytes();
+  }
+
+  set depositTxnHash(value: Bytes) {
+    this.set("depositTxnHash", Value.fromBytes(value));
+  }
+
+  get withdrawTxnHash(): Bytes {
+    let value = this.get("withdrawTxnHash");
+    return value!.toBytes();
+  }
+
+  set withdrawTxnHash(value: Bytes) {
+    this.set("withdrawTxnHash", Value.fromBytes(value));
+  }
+
+  get transferTxnHash(): Bytes {
+    let value = this.get("transferTxnHash");
+    return value!.toBytes();
+  }
+
+  set transferTxnHash(value: Bytes) {
+    this.set("transferTxnHash", Value.fromBytes(value));
   }
 
   get fromAmount(): BigInt {
@@ -513,9 +573,12 @@ export class GroupExecution extends Entity {
     this.set("groupId", Value.fromBytes(Bytes.empty()));
     this.set("inputAmount", Value.fromBigInt(BigInt.zero()));
     this.set("returnAmount", Value.fromBigInt(BigInt.zero()));
+    this.set("returnAmountLeft", Value.fromBigInt(BigInt.zero()));
     this.set("usedGas", Value.fromBigInt(BigInt.zero()));
     this.set("txnHash", Value.fromBytes(Bytes.empty()));
     this.set("compltdTxnHashes", Value.fromBytesArray(new Array(0)));
+    this.set("blockNumber", Value.fromBigInt(BigInt.zero()));
+    this.set("blockIndex", Value.fromBigInt(BigInt.zero()));
   }
 
   save(): void {
@@ -571,6 +634,15 @@ export class GroupExecution extends Entity {
     this.set("returnAmount", Value.fromBigInt(value));
   }
 
+  get returnAmountLeft(): BigInt {
+    let value = this.get("returnAmountLeft");
+    return value!.toBigInt();
+  }
+
+  set returnAmountLeft(value: BigInt) {
+    this.set("returnAmountLeft", Value.fromBigInt(value));
+  }
+
   get usedGas(): BigInt {
     let value = this.get("usedGas");
     return value!.toBigInt();
@@ -596,6 +668,24 @@ export class GroupExecution extends Entity {
 
   set compltdTxnHashes(value: Array<Bytes>) {
     this.set("compltdTxnHashes", Value.fromBytesArray(value));
+  }
+
+  get blockNumber(): BigInt {
+    let value = this.get("blockNumber");
+    return value!.toBigInt();
+  }
+
+  set blockNumber(value: BigInt) {
+    this.set("blockNumber", Value.fromBigInt(value));
+  }
+
+  get blockIndex(): BigInt {
+    let value = this.get("blockIndex");
+    return value!.toBigInt();
+  }
+
+  set blockIndex(value: BigInt) {
+    this.set("blockIndex", Value.fromBigInt(value));
   }
 }
 
@@ -682,6 +772,8 @@ export class WithdrawRequest extends Entity {
     this.set("groupId", Value.fromBytes(Bytes.empty()));
     this.set("withdrawToken", Value.fromBytes(Bytes.empty()));
     this.set("amount", Value.fromBigInt(BigInt.zero()));
+    this.set("groupTxnHash", Value.fromBytes(Bytes.empty()));
+    this.set("withdrawTxnHash", Value.fromBytes(Bytes.empty()));
   }
 
   save(): void {
@@ -744,6 +836,24 @@ export class WithdrawRequest extends Entity {
 
   set amount(value: BigInt) {
     this.set("amount", Value.fromBigInt(value));
+  }
+
+  get groupTxnHash(): Bytes {
+    let value = this.get("groupTxnHash");
+    return value!.toBytes();
+  }
+
+  set groupTxnHash(value: Bytes) {
+    this.set("groupTxnHash", Value.fromBytes(value));
+  }
+
+  get withdrawTxnHash(): Bytes {
+    let value = this.get("withdrawTxnHash");
+    return value!.toBytes();
+  }
+
+  set withdrawTxnHash(value: Bytes) {
+    this.set("withdrawTxnHash", Value.fromBytes(value));
   }
 }
 
