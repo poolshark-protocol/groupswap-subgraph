@@ -207,10 +207,8 @@ export function handleGroupExecuted(event: GroupExecuted): void {
     newGroupExecution.groupId = groupId
     newGroupExecution.usedGas = gasUsed
     newGroupExecution.inputAmount = inputAmount
-    newGroupExecution.txnHash = txnHash
     newGroupExecution.blockNumber = blockNumber
     newGroupExecution.blockIndex = blockIndex
-    
     newGroupExecution.save()
   }
 

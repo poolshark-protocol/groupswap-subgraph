@@ -575,7 +575,6 @@ export class GroupExecution extends Entity {
     this.set("returnAmount", Value.fromBigInt(BigInt.zero()));
     this.set("returnAmountLeft", Value.fromBigInt(BigInt.zero()));
     this.set("usedGas", Value.fromBigInt(BigInt.zero()));
-    this.set("txnHash", Value.fromBytes(Bytes.empty()));
     this.set("compltdTxnHashes", Value.fromBytesArray(new Array(0)));
     this.set("blockNumber", Value.fromBigInt(BigInt.zero()));
     this.set("blockIndex", Value.fromBigInt(BigInt.zero()));
@@ -650,15 +649,6 @@ export class GroupExecution extends Entity {
 
   set usedGas(value: BigInt) {
     this.set("usedGas", Value.fromBigInt(value));
-  }
-
-  get txnHash(): Bytes {
-    let value = this.get("txnHash");
-    return value!.toBytes();
-  }
-
-  set txnHash(value: Bytes) {
-    this.set("txnHash", Value.fromBytes(value));
   }
 
   get compltdTxnHashes(): Array<Bytes> {

@@ -64,7 +64,6 @@ type GroupExecution @entity {
   returnAmount:      BigInt!
   returnAmountLeft:  BigInt!
   usedGas:           BigInt!
-  txnHash:           Bytes!
   compltdTxnHashes: [Bytes!]!
   blockNumber:       BigInt!
   blockIndex:        BigInt!
