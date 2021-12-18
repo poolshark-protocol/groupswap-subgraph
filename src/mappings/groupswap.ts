@@ -154,7 +154,7 @@ export function handleGroupExecuted(event: GroupExecuted): void {
           let completedOrder = CompletedOrder.load(openOrders[i].toHex())
           let excludeTxnHash = (blockNumber == openOrder.blockNumber) && (blockIndex > openOrder.blockIndex)
 
-          // check block and blockIndex deposited
+          // check block deposited
           if(!completedOrder && !excludeTxnHash){
 
             // initialize completed order
@@ -217,6 +217,7 @@ export function handleGroupExecuted(event: GroupExecuted): void {
 export function handleWithdrawDeclined(event: WithdrawDeclined): void {}
 
 // TODO: if it can be declined right away...store a withdraw declined event?
+// remove partial withdraws from event
 export function handleWithdrawRequested(event: WithdrawRequested): void {
   let account = event.params.user
   let withdrawAmount = event.params.amount
