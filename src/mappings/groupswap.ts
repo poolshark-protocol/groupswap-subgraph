@@ -31,6 +31,10 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   let depositAmount = event.params.amount;
   let userGas = event.params.userGas;
 
+  if(depositAmount == BigInt.fromI32(0) && userGas == BigInt.fromI32(0)){
+    return
+  }
+
   //transaction data
   let txnHash = event.transaction.hash;
   let blockIndex = event.transaction.index
@@ -78,7 +82,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   orderEntity.fromAmount      = depositAmount
   orderEntity.destAmount      = BigInt.fromI32(0)
   orderEntity.weiAdded        = userGas
-  orderEntity.weiReturn     = BigInt.fromI32(0)
+  orderEntity.weiReturn       = BigInt.fromI32(0)
   orderEntity.depstTxnHash    = txnHash
   orderEntity.depstAmount     = depositAmount
   orderEntity.depstBlock      = event.block.number
