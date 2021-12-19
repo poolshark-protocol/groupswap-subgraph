@@ -28,8 +28,6 @@ type Order @entity {
   canclAmount:     BigInt!
   wthdrwTxnHashes: [Bytes!]!
   wthdrwAmount:    BigInt!
-  trnsfrTxnHashes: [Bytes!]!
-  trnsfrAmount:    BigInt!
 }
 
 type GroupExecution @entity {
@@ -52,6 +50,7 @@ type CancelRequest @entity {
   amount:          BigInt!
   block:           BigInt!
   blockIndex:      BigInt!
+  trnsfrTxnHash:   Bytes!
 }
 
 type WithdrawRequest @entity {
@@ -62,18 +61,5 @@ type WithdrawRequest @entity {
   amount:          BigInt!
   block:           BigInt!
   blockIndex:      BigInt!
-}
-
-type WithdrawApproved @entity {
-  id:       ID!
-  address:  Bytes!
-  groupIds: [Bytes!]!
-  amounts:  [BigInt!]!
-}
-
-type WithdrawDeclined @entity {
-  id:       ID!
-  address:  Bytes!
-  groupIds: [Bytes!]!
-  amounts:  [BigInt!]!
+  trnsfrTxnHash:   Bytes!
 }

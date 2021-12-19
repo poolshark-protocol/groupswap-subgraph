@@ -10,7 +10,7 @@ import {
 import { 
  CancelRequest,
  WithdrawRequest,
- GroupOrder, UserAccount, Order, GroupExecution
+ GroupOrder, Order, GroupExecution
 } from "../../generated/schema"
 
 import { JSON } from "assemblyscript-json";
@@ -18,7 +18,7 @@ import { JSON } from "assemblyscript-json";
 const OPEN_STATUS             = "open"
 const CANCELLED_STATUS        = "cancelled"
 const EXECUTED_STATUS         = "executed"
-const COMPLETED_STATUS        = "complete"
+const COMPLETED_STATUS        = "completed"
 
 export function handleDepositedToGroup(event: DepositedToGroup): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -78,6 +78,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   orderEntity.fromAmount      = depositAmount
   orderEntity.destAmount      = BigInt.fromI32(0)
   orderEntity.weiAdded        = userGas
+  orderEntity.weiReturned     = BigInt.fromI32(0)
   orderEntity.depstTxnHash    = txnHash
   orderEntity.depstAmount     = depositAmount
   orderEntity.depstBlock      = event.block.number
@@ -86,8 +87,6 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   orderEntity.canclAmount     = BigInt.fromI32(0)
   orderEntity.wthdrwTxnHashes = new Array<Bytes>()
   orderEntity.wthdrwAmount    = BigInt.fromI32(0)
-  orderEntity.trnsfrTxnHashes = new Array<Bytes>()
-  orderEntity.trnsfrAmount    = BigInt.fromI32(0)
   orderEntity.save()
 }
 
@@ -196,6 +195,7 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
 
   //GroupData
   let order = Order.load(depositTxnHash.toHex())
+  let wthdrwAmount = BigInt.fromI32(0)
   
 
   // check if account matches
@@ -206,6 +206,27 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
     if (order.status == 'open' && accountMatches) {
       let fromTokenMatches = withdrawToken.toHex() == order.fromToken.toHex()
       if(fromTokenMatches){
+
+        let amountLeft = order.fromAmount
+
+        //check if user is trying to withdraw all
+        if(withdrawAmount >= amountLeft){
+          wthdrwAmount = amountLeft
+          order.status = CANCELLED_STATUS
+          order.fromAmount = BigInt.fromI32(0)
+          order.canclAmount = order.canclAmount.plus(amountLeft)
+        }
+        else{
+          wthdrwAmount = withdrawAmount
+          order.fromAmount = order.fromAmount.minus(withdrawAmount)
+          order.wthdrwAmount = order.canclAmount.plus(withdrawAmount)
+        }
+
+        let newCanclTxnHashes = order.canclTxnHashes
+        newCanclTxnHashes.push(txnHash)
+        order.canclTxnHashes = newCanclTxnHashes
+        order.save()
+
         let cancelRequest = new CancelRequest(txnHash.toHex())
         cancelRequest.account = account
         cancelRequest.orderTxnHash = order.depstTxnHash
@@ -213,7 +234,7 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
         cancelRequest.amount = withdrawAmount
         cancelRequest.block = blockNumber
         cancelRequest.blockIndex = blockIndex
-        cancelRequest.save()
+        cancelRequest.save()        
       }
       else{
         //handle error
@@ -223,11 +244,32 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
       let destTokenMatches = withdrawToken.toHex() == order.destToken.toHex()
       // check token requested matches
       if (destTokenMatches){
+
+        let amountLeft = order.destAmount
+
+        //check if user is trying to withdraw all
+        if(withdrawAmount >= amountLeft){
+          wthdrwAmount = amountLeft
+          order.status = COMPLETED_STATUS
+          order.destAmount = BigInt.fromI32(0)
+          order.wthdrwAmount = order.wthdrwAmount.plus(amountLeft)
+        }
+        else{
+          wthdrwAmount = withdrawAmount
+          order.destAmount = order.destAmount.minus(withdrawAmount)
+          order.wthdrwAmount = order.wthdrwAmount.plus(withdrawAmount)
+        }
+
+        let newWthdrwTxnHashes = order.wthdrwTxnHashes
+        newWthdrwTxnHashes.push(txnHash)
+        order.wthdrwTxnHashes = newWthdrwTxnHashes
+        order.save()
+        
         let withdrawRequest = new WithdrawRequest(txnHash.toHex())
         withdrawRequest.account = account
         withdrawRequest.orderTxnHash = order.depstTxnHash
         withdrawRequest.withdrawToken = order.destToken
-        withdrawRequest.amount = withdrawAmount
+        withdrawRequest.amount = wthdrwAmount
         withdrawRequest.block = blockNumber
         withdrawRequest.blockIndex = blockIndex
         withdrawRequest.save()
