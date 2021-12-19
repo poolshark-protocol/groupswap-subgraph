@@ -1,2 +1,2 @@
-# swap-rollups-subgraph
+# poolsharks-subgraphs
 
