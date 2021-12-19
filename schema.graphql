@@ -7,11 +7,6 @@ type GroupOrder @entity {
   orderTxnHashes:  [Bytes!]!
 }
 
-type UserAccount @entity {
-  id:           ID!
-  groupAmounts: String!
-}
-
 type Order @entity {
   id:              ID!
   account:         Bytes!

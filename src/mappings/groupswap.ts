@@ -68,49 +68,6 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   //save groupEntity
   groupEntity.save()
 
-  //UserData
-  let userEntity = UserAccount.load(account.toHex())
-
-  if (!userEntity) {
-    userEntity = new UserAccount(account.toHex())
-    userEntity.groupAmounts = "{}";
-  }
-
-  let groupAmounts: JSON.Obj = <JSON.Obj>JSON.parse(userEntity.groupAmounts)
-  let groupAmountObj: JSON.Obj | null = groupAmounts.getObj(groupId.toHex())
-  let newFromAmount: BigInt = BigInt.fromI32(0);
-
-  // create groupAmounts JSON object
-  let groupAmount = new JSON.Obj()
-  groupAmount.set("fromToken",fromToken.toHex())
-  groupAmount.set("destToken",destToken.toHex())
-  
-  // //if groupId exists
-  if(groupAmountObj){
-
-    let fromAmountStr: JSON.Value = groupAmountObj.valueOf().get("fromAmount")
-    let destAmountStr: JSON.Value = groupAmountObj.valueOf().get("destAmount")
-
-    if(fromAmountStr){
-      newFromAmount = BigInt.fromString(fromAmountStr.toString()).plus(depositAmount)
-      groupAmount.set("fromAmount", newFromAmount.toString())
-      groupAmount.set("destAmount", destAmountStr)
-      groupAmounts.set(groupId.toHex(), groupAmount)
-    }
-  }
-
-  //if groupId doesn't exist
-  else{
-    groupAmount.set("fromAmount",depositAmount.toString())
-    groupAmount.set("destAmount","0")
-    groupAmounts.set(groupId.toHex(),groupAmount)
-  }
-  
-  userEntity.groupAmounts = groupAmounts.stringify()
-
-  // Entities can be written to the store with `.save()`
-  userEntity.save()
-
   // OrderData
   let orderEntity = new Order(txnHash.toHex())
   orderEntity.account         = account
