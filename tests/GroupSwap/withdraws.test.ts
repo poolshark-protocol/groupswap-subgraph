@@ -12,9 +12,9 @@ import { handleGroupExecuted, handleWithdrawRequested } from "../../src/mappings
 
 let CANCELREQUEST_ENTITY_TYPE  = "CancelRequest"
 let WITHDRAWREQUEST_ENTITY_TYPE = "WithdrawRequest"
-let USERORDER_ENTITY_TYPE = "OpenOrder"
+let ORDER_ENTITY_TYPE = "Order"
 
-test("Can mock getGroup contract function", () => {
+test("handleWithdrawRequested - mock getGroup contract function", () => {
   let contractAddress = Address.fromString("0x5101feD546FacccD309A77Ad755170f8fBf1E81D")
   let contractName    = "GroupSwap"
   let functionName    = "getGroup" 
@@ -34,7 +34,7 @@ test("Can mock getGroup contract function", () => {
     .returns([ethereum.Value.fromBytes(groupId)])
 })
 
-test("Can initialise store with an array of Entity objects", () => {
+test("handleWithdrawRequested - initialise store of Entity objects", () => {
   let cancelRequest = new CancelRequest("0xbcb55f6655dc8ec543b0349004fb2f9da2553c885d1787f5eb3f4356be079126")
   cancelRequest.save()
 
@@ -53,7 +53,7 @@ test("Can initialise store with an array of Entity objects", () => {
   clearStore()
 })
   
-test("handleDepositedToGroup - should handle new CancelRequest", () => {
+test("handlewithdrawRequested - should handle new CancelRequest", () => {
 
   // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
@@ -69,7 +69,7 @@ test("handleDepositedToGroup - should handle new CancelRequest", () => {
   //logStore()
 
   assert.fieldEquals(
-    USERORDER_ENTITY_TYPE, "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    ORDER_ENTITY_TYPE, "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
     "id",
     "0xa16081f360e3847006db660bae1c6d1b2e17ec2a" 
   )
@@ -87,13 +87,13 @@ test("handleDepositedToGroup - should handle new CancelRequest", () => {
 
   handleNewWithdrawRequested([newWithdrawRequestedEvent])
 
-  //logStore()
+  logStore()
 
   assert.fieldEquals(
       CANCELREQUEST_ENTITY_TYPE,
       "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
-      "groupId",
-      "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e"
+      "orderTxnHash",
+      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a"
   )
 
   assert.fieldEquals(
@@ -120,7 +120,7 @@ test("handleDepositedToGroup - should handle new CancelRequest", () => {
   clearStore()
 })
 
-test("handleDepositedToGroup - should handle new WithdrawRequest", () => {
+test("handleWithdrawRequested - should handle new WithdrawRequest", () => {
 
   // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
@@ -136,7 +136,7 @@ test("handleDepositedToGroup - should handle new WithdrawRequest", () => {
   //logStore()
 
   assert.fieldEquals(
-    USERORDER_ENTITY_TYPE, "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    ORDER_ENTITY_TYPE, "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
     "id",
     "0xa16081f360e3847006db660bae1c6d1b2e17ec2a"
   )
@@ -161,7 +161,7 @@ test("handleDepositedToGroup - should handle new WithdrawRequest", () => {
 
   handleNewWithdrawRequested([newWithdrawRequestedEvent])
 
-  logStore()
+  //logStore()
 
   assert.fieldEquals(
     WITHDRAWREQUEST_ENTITY_TYPE,

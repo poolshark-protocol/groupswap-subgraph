@@ -12,49 +12,29 @@ type UserAccount @entity {
   groupAmounts: String!
 }
 
-type OpenOrder @entity {
-  id:           ID!
-  account:      Bytes!
-  groupId:      Bytes!
-  fromToken:    Bytes!
-  destToken:    Bytes!
-  fromAmount:   BigInt!
-  gweiAdded:    BigInt!
-  blockNumber:  BigInt!
-  blockIndex:   BigInt!
-}
-
-type ExecutedOrder @entity {
-  id:           ID!
-  account:      Bytes!
-  groupId:      Bytes!
-  fromToken:    Bytes!
-  destToken:    Bytes!
-  destAmount:   BigInt!
-  gweiLeft:     BigInt!
-  groupTxnHash: BigInt!
-  blockNumber:  BigInt!
-  blockIndex:   BigInt!
-}
-
-type CancelledOrder @entity {
+type Order @entity {
   id:              ID!
   account:         Bytes!
+  status:          String!
+  groupId:         Bytes!
   fromToken:       Bytes!
   destToken:       Bytes!
-  depositTxnHash:  Bytes!
-  withdrawTxnHash: Bytes!
-  transferTxnHash: Bytes!
   fromAmount:      BigInt!
-}
-
-type CompletedOrder @entity {
-  id:           ID!
-  account:      Bytes!
-  fromToken:    Bytes!
-  destToken:    Bytes!
-  destAmount:   BigInt!
-  groupTxnHash: Bytes!
+  destAmount:      BigInt!
+  returnAmount:    BigInt
+  groupTxnHash:    Bytes
+  weiAdded:        BigInt!
+  weiReturned:     BigInt
+  depstTxnHash:    Bytes!
+  depstAmount:     BigInt!
+  depstBlock:      BigInt!
+  depstIndex:      BigInt!
+  canclTxnHashes:  [Bytes!]!
+  canclAmount:     BigInt!
+  wthdrwTxnHashes: [Bytes!]!
+  wthdrwAmount:    BigInt!
+  trnsfrTxnHashes: [Bytes!]!
+  trnsfrAmount:    BigInt!
 }
 
 type GroupExecution @entity {
@@ -70,21 +50,23 @@ type GroupExecution @entity {
 }
 
 type CancelRequest @entity {
-  id:            ID!
-  account:       Bytes!
-  groupId:       Bytes!
-  withdrawToken: Bytes! 
-  amount:        BigInt!
+  id:              ID!
+  account:         Bytes!
+  orderTxnHash:    Bytes!
+  withdrawToken:   Bytes! 
+  amount:          BigInt!
+  block:           BigInt!
+  blockIndex:      BigInt!
 }
 
 type WithdrawRequest @entity {
   id:              ID!
   account:         Bytes!
-  groupId:         Bytes!
+  orderTxnHash:    Bytes!
   withdrawToken:   Bytes! 
   amount:          BigInt!
-  groupTxnHash:    Bytes!
-  withdrawTxnHash: Bytes!
+  block:           BigInt!
+  blockIndex:      BigInt!
 }
 
 type WithdrawApproved @entity {

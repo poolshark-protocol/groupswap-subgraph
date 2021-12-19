@@ -11,7 +11,7 @@ import { JSON } from "assemblyscript-json";
 
 let USER_ENTITY_TYPE  = "UserAccount"
 let GROUPORDER_ENTITY_TYPE = "GroupOrder"
-let USERORDER_ENTITY_TYPE = "OpenOrder"
+let ORDER_ENTITY_TYPE = "Order"
 
 test("Can initialise store with an array of Entity objects", () => {
   let groupData = new GroupOrder("0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e")
@@ -282,7 +282,7 @@ test("handleDepositedToGroup - should handle new OpenOrder", () => {
   //logStore()
 
   assert.fieldEquals(
-    USERORDER_ENTITY_TYPE, "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    ORDER_ENTITY_TYPE, "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
     "id",
     "0xa16081f360e3847006db660bae1c6d1b2e17ec2a" 
   )

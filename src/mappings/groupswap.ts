@@ -8,13 +8,17 @@ import {
   GroupExecuted__Params
 } from "../../generated/PredaDex/GroupSwap"
 import { 
- CancelledOrder,
  CancelRequest,
  WithdrawRequest,
- GroupOrder, OpenOrder, UserAccount, CompletedOrder, GroupExecution
+ GroupOrder, UserAccount, Order, GroupExecution
 } from "../../generated/schema"
 
-import { JSON } from "assemblyscript-json"; 
+import { JSON } from "assemblyscript-json";
+
+const OPEN_STATUS             = "open"
+const CANCELLED_STATUS        = "cancelled"
+const EXECUTED_STATUS         = "executed"
+const COMPLETED_STATUS        = "complete"
 
 export function handleDepositedToGroup(event: DepositedToGroup): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -108,16 +112,25 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   userEntity.save()
 
   // OrderData
-  let orderEntity = new OpenOrder(txnHash.toHex())
-
-  orderEntity.gweiAdded   = userGas
-  orderEntity.fromToken   = fromToken
-  orderEntity.destToken   = destToken
-  orderEntity.fromAmount  = depositAmount
-  orderEntity.account     = account
-  orderEntity.groupId     = groupId
-  orderEntity.blockNumber = event.block.number
-  orderEntity.blockIndex  = event.transaction.index
+  let orderEntity = new Order(txnHash.toHex())
+  orderEntity.account         = account
+  orderEntity.status          = OPEN_STATUS
+  orderEntity.groupId         = groupId
+  orderEntity.fromToken       = fromToken
+  orderEntity.destToken       = destToken
+  orderEntity.fromAmount      = depositAmount
+  orderEntity.destAmount      = BigInt.fromI32(0)
+  orderEntity.weiAdded        = userGas
+  orderEntity.depstTxnHash    = txnHash
+  orderEntity.depstAmount     = depositAmount
+  orderEntity.depstBlock      = event.block.number
+  orderEntity.depstIndex      = event.transaction.index
+  orderEntity.canclTxnHashes  = new Array<Bytes>()
+  orderEntity.canclAmount     = BigInt.fromI32(0)
+  orderEntity.wthdrwTxnHashes = new Array<Bytes>()
+  orderEntity.wthdrwAmount    = BigInt.fromI32(0)
+  orderEntity.trnsfrTxnHashes = new Array<Bytes>()
+  orderEntity.trnsfrAmount    = BigInt.fromI32(0)
   orderEntity.save()
 }
 
@@ -149,20 +162,13 @@ export function handleGroupExecuted(event: GroupExecuted): void {
 
       for (let i = 0 ; i < groupOrder.orderTxnHashes.length; ++i) {
         // load each txnHash from openOrders
-        let openOrder = OpenOrder.load(openOrders[i].toHex())
-        if(openOrder){
-          let completedOrder = CompletedOrder.load(openOrders[i].toHex())
-          let excludeTxnHash = (blockNumber == openOrder.blockNumber) && (blockIndex > openOrder.blockIndex)
-
+        let openOrder = Order.load(openOrders[i].toHex())
+        if(openOrder && openOrder.status == "open"){
+          // exclude txn hashes
+          let excludeTxnHash = (blockNumber == openOrder.depstBlock) && (openOrder.depstIndex < blockIndex)
+          
           // check block deposited
-          if(!completedOrder && !excludeTxnHash){
-
-            // initialize completed order
-            let newCompletedOrder = new CompletedOrder(openOrders[i].toHex())
-            newCompletedOrder.account = openOrder.account
-            newCompletedOrder.fromToken = openOrder.fromToken
-            newCompletedOrder.destToken = openOrder.destToken
-            newCompletedOrder.groupTxnHash = txnHash
+          if(!excludeTxnHash){
 
             // divide up returnAmount for each order
             let fromAmountDecimal  = BigDecimal.fromString(openOrder.fromAmount.toString())
@@ -171,10 +177,14 @@ export function handleGroupExecuted(event: GroupExecuted): void {
             let destAmountStr      = returnAmount.toBigDecimal().times(orderGroupRatio).toString().split('.')[0]
           
             // save entity
-            newCompletedOrder.destAmount = BigInt.fromString(destAmountStr)
-            newCompletedOrder.save()
-            // remove from openOrder status
-            store.remove('OpenOrder', openOrders[i].toHex())
+            openOrder.status       = EXECUTED_STATUS
+            openOrder.fromAmount   = BigInt.fromI32(0)
+            openOrder.destAmount   = BigInt.fromString(destAmountStr)
+            openOrder.returnAmount = BigInt.fromString(destAmountStr)
+            openOrder.groupTxnHash = txnHash
+            // TODO: split wei 80/20
+            openOrder.weiReturned  = BigInt.fromI32(0)
+            openOrder.save()
 
             // add to list of completedOrders for GroupExecution
             compltdTxnHashes.push(openOrders[i])
@@ -223,52 +233,55 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
   let withdrawAmount = event.params.amount
   let withdrawToken = event.params.withdrawToken
   let depositTxnHash = event.params.depositTxnHash
+  let txnHash = event.transaction.hash
+  let blockNumber = event.block.number
+  let blockIndex = event.transaction.index
 
   //GroupData
-  let openOrder = OpenOrder.load(depositTxnHash.toHex())
-  let completedOrder = CompletedOrder.load(depositTxnHash.toHex())
-
-  if (openOrder) {
-    let groupId = openOrder.groupId
-    let originAccount = openOrder.account
-
-    // check if account matches
-    if(originAccount.toHex() == account.toHex()){
-      if(withdrawToken.toHex() == openOrder.fromToken.toHex()){
-        let cancelRequest = CancelRequest.load(depositTxnHash.toHex())
-
-        // check for duplicate requests
-        if(!cancelRequest){
-          cancelRequest = new CancelRequest(depositTxnHash.toHex())
-          cancelRequest.account = account
-          cancelRequest.amount = openOrder.fromAmount
-          cancelRequest.groupId = groupId
-          cancelRequest.withdrawToken = openOrder.fromToken
-          cancelRequest.save()
-        }
-      }
-    }
-  }
+  let order = Order.load(depositTxnHash.toHex())
   
-  else if(completedOrder) {
-    let originAccount = completedOrder.account
 
-    // check if account matches
-    if(originAccount.toHex() == account.toHex()){
-      // check token requested matches
-      if (withdrawToken.toHex() == completedOrder.destToken.toHex()){
-        let withdrawRequest = WithdrawRequest.load(depositTxnHash.toHex())
-
-        // check for duplicated requests
-        if(!withdrawRequest){
-          withdrawRequest = new WithdrawRequest(depositTxnHash.toHex())
-          withdrawRequest.account = account
-          withdrawRequest.amount = completedOrder.destAmount
-          withdrawRequest.groupTxnHash =  completedOrder.groupTxnHash
-          withdrawRequest.withdrawToken = withdrawToken
-          withdrawRequest.save()
-        }
+  // check if account matches
+  if(order){
+    let groupId = order.groupId
+    let originAccount = order.account
+    let accountMatches = originAccount.toHex() == account.toHex()
+    if (order.status == 'open' && accountMatches) {
+      let fromTokenMatches = withdrawToken.toHex() == order.fromToken.toHex()
+      if(fromTokenMatches){
+        let cancelRequest = new CancelRequest(txnHash.toHex())
+        cancelRequest.account = account
+        cancelRequest.orderTxnHash = order.depstTxnHash
+        cancelRequest.withdrawToken = order.fromToken
+        cancelRequest.amount = withdrawAmount
+        cancelRequest.block = blockNumber
+        cancelRequest.blockIndex = blockIndex
+        cancelRequest.save()
+      }
+      else{
+        //handle error
       }
     }
+    else if(order.status == 'executed' && accountMatches) {
+      let destTokenMatches = withdrawToken.toHex() == order.destToken.toHex()
+      // check token requested matches
+      if (destTokenMatches){
+        let withdrawRequest = new WithdrawRequest(txnHash.toHex())
+        withdrawRequest.account = account
+        withdrawRequest.orderTxnHash = order.depstTxnHash
+        withdrawRequest.withdrawToken = order.destToken
+        withdrawRequest.amount = withdrawAmount
+        withdrawRequest.block = blockNumber
+        withdrawRequest.blockIndex = blockIndex
+        withdrawRequest.save()
+      }
+      else{
+        //handle error
+      }
+    }
+    else{
+      //handle error
+    }
+
   }
 }

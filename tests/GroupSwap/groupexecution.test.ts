@@ -12,7 +12,7 @@ import { handleGroupExecuted, handleWithdrawRequested } from "../../src/mappings
 
 let GROUPEXECUTION_ENTITY_TYPE = "GroupExecution"
 
-test("handleDepositedToGroup - should handle new GroupExecution", () => {
+test("handleGroupExecuted - should handle new GroupExecution", () => {
 
     // Call mappings
   let newDepositedToGroupEvent = createNewDepositedToGroupEvent(
