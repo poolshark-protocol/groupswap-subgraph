@@ -1,0 +1,18 @@
+DONE- there is a never a scenario where a GroupExecution would happen without a GroupOrder
+the reason is that we are checking our Subgraph for GroupOrders that already exist
+therefore a GroupExecution without a GroupOrder is not possible
+
+DONE - in the case that a deposit happens on the same block as a GroupExecution on an earlier index, we need to preserve that/those transaction hashes
+this is so those OpenOrders are not lost when the next GroupExecution occurs
+
+orders that are cancelled need to be removed from the orderTxnHashes list
+
+group amounts updated when cancelling/withdrawing
+
+we want to see both the deposit, withdraw request, and transfer token hashes in the end
+
+subtract out the gas for deposits that weren't included in that swap
+
+you should not be able to cancel if the group is going to execute that same block
+
+we need to handle users trying to submit multiple cancel/withdraw requests on the same block

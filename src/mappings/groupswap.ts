@@ -49,7 +49,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   if (!groupEntity) {
     groupEntity = new GroupOrder(groupId.toHex())
     groupEntity.groupAmount = BigInt.fromI32(0)
-    groupEntity.groupGwei = BigInt.fromI32(0)
+    groupEntity.groupWei = BigInt.fromI32(0)
     let orderTxnHashes = new Array<Bytes>(0)
     orderTxnHashes.push(txnHash)
     groupEntity.orderTxnHashes = orderTxnHashes
@@ -61,7 +61,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   }
   
   groupEntity.groupAmount = groupEntity.groupAmount.plus(depositAmount)
-  groupEntity.groupGwei = groupEntity.groupGwei.plus(userGas)
+  groupEntity.groupWei = groupEntity.groupWei.plus(userGas)
   groupEntity.fromToken = fromToken
   groupEntity.destToken = destToken
 
@@ -78,7 +78,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   orderEntity.fromAmount      = depositAmount
   orderEntity.destAmount      = BigInt.fromI32(0)
   orderEntity.weiAdded        = userGas
-  orderEntity.weiReturned     = BigInt.fromI32(0)
+  orderEntity.weiReturn     = BigInt.fromI32(0)
   orderEntity.depstTxnHash    = txnHash
   orderEntity.depstAmount     = depositAmount
   orderEntity.depstBlock      = event.block.number
@@ -139,7 +139,7 @@ export function handleGroupExecuted(event: GroupExecuted): void {
             openOrder.returnAmount = BigInt.fromString(destAmountStr)
             openOrder.groupTxnHash = txnHash
             // TODO: split wei 80/20
-            openOrder.weiReturned  = BigInt.fromI32(0)
+            openOrder.weiReturn  = BigInt.fromI32(0)
             openOrder.save()
 
             // add to list of completedOrders for GroupExecution
@@ -162,7 +162,7 @@ export function handleGroupExecuted(event: GroupExecuted): void {
 
       // modify groupOrder and save changes
       groupOrder.groupAmount = groupOrder.groupAmount.minus(inputAmount)
-      groupOrder.groupGwei = groupOrder.groupGwei.minus(gasUsed)
+      groupOrder.groupWei = groupOrder.groupWei.minus(gasUsed)
       groupOrder.orderTxnHashes = newOpenOrders
       groupOrder.save() 
     }    
@@ -186,7 +186,7 @@ export function handleWithdrawDeclined(event: WithdrawDeclined): void {}
 // remove partial withdraws from event
 export function handleWithdrawRequested(event: WithdrawRequested): void {
   let account = event.params.user
-  let withdrawAmount = event.params.amount
+  let amountParam = event.params.amount
   let withdrawToken = event.params.withdrawToken
   let depositTxnHash = event.params.depositTxnHash
   let txnHash = event.transaction.hash
@@ -200,41 +200,57 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
 
   // check if account matches
   if(order){
-    let groupId = order.groupId
     let originAccount = order.account
     let accountMatches = originAccount.toHex() == account.toHex()
     if (order.status == 'open' && accountMatches) {
+      let groupOrder = GroupOrder.load(order.groupId.toHex())  
       let fromTokenMatches = withdrawToken.toHex() == order.fromToken.toHex()
-      if(fromTokenMatches){
+      if(fromTokenMatches && groupOrder){
 
         let amountLeft = order.fromAmount
 
         //check if user is trying to withdraw all
-        if(withdrawAmount >= amountLeft){
+        if(amountParam >= amountLeft){
           wthdrwAmount = amountLeft
           order.status = CANCELLED_STATUS
           order.fromAmount = BigInt.fromI32(0)
           order.canclAmount = order.canclAmount.plus(amountLeft)
         }
         else{
-          wthdrwAmount = withdrawAmount
-          order.fromAmount = order.fromAmount.minus(withdrawAmount)
-          order.wthdrwAmount = order.canclAmount.plus(withdrawAmount)
+          wthdrwAmount = amountParam
+          order.fromAmount = order.fromAmount.minus(amountParam)
+          order.wthdrwAmount = order.canclAmount.plus(amountParam)
         }
+        
+        groupOrder.groupAmount = groupOrder.groupAmount.minus(wthdrwAmount)
+        
 
         let newCanclTxnHashes = order.canclTxnHashes
         newCanclTxnHashes.push(txnHash)
         order.canclTxnHashes = newCanclTxnHashes
-        order.save()
 
         let cancelRequest = new CancelRequest(txnHash.toHex())
         cancelRequest.account = account
         cancelRequest.orderTxnHash = order.depstTxnHash
         cancelRequest.withdrawToken = order.fromToken
-        cancelRequest.amount = withdrawAmount
+        cancelRequest.amount = amountParam
         cancelRequest.block = blockNumber
         cancelRequest.blockIndex = blockIndex
-        cancelRequest.save()        
+
+        //if no wei has been returned and the user has fully cancelled
+        if(order.weiReturn == BigInt.fromI32(0) && order.fromAmount.equals(BigInt.fromI32(0))){
+          cancelRequest.weiReturn = order.weiAdded
+          order.weiReturn = order.weiAdded
+          groupOrder.groupWei = groupOrder.groupWei.minus(order.weiAdded)
+        }
+        //else don't return any wei
+        else{
+          cancelRequest.weiReturn = BigInt.fromI32(0)
+        }
+
+        cancelRequest.save() 
+        order.save()
+        groupOrder.save()       
       }
       else{
         //handle error
@@ -242,28 +258,29 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
     }
     else if(order.status == 'executed' && accountMatches) {
       let destTokenMatches = withdrawToken.toHex() == order.destToken.toHex()
+      let groupExecution = GroupExecution.load(order.groupTxnHash.toHex())
       // check token requested matches
-      if (destTokenMatches){
+      if (destTokenMatches && groupExecution){
 
         let amountLeft = order.destAmount
 
         //check if user is trying to withdraw all
-        if(withdrawAmount >= amountLeft){
+        if(amountParam >= amountLeft){
           wthdrwAmount = amountLeft
           order.status = COMPLETED_STATUS
           order.destAmount = BigInt.fromI32(0)
           order.wthdrwAmount = order.wthdrwAmount.plus(amountLeft)
         }
+        // else allow partial withdraw
         else{
-          wthdrwAmount = withdrawAmount
-          order.destAmount = order.destAmount.minus(withdrawAmount)
-          order.wthdrwAmount = order.wthdrwAmount.plus(withdrawAmount)
+          wthdrwAmount = amountParam
+          order.destAmount = order.destAmount.minus(amountParam)
+          order.wthdrwAmount = order.wthdrwAmount.plus(amountParam)
         }
 
         let newWthdrwTxnHashes = order.wthdrwTxnHashes
         newWthdrwTxnHashes.push(txnHash)
         order.wthdrwTxnHashes = newWthdrwTxnHashes
-        order.save()
         
         let withdrawRequest = new WithdrawRequest(txnHash.toHex())
         withdrawRequest.account = account
@@ -272,7 +289,21 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
         withdrawRequest.amount = wthdrwAmount
         withdrawRequest.block = blockNumber
         withdrawRequest.blockIndex = blockIndex
+
+        //if no wei has been returned and the user has fully withdrawn
+        if(order.weiReturn == BigInt.fromI32(0) && order.fromAmount.equals(BigInt.fromI32(0))){
+          //note: order.weiReturn is updated in GroupExecuted handler 
+          withdrawRequest.weiReturn = order.weiReturn
+          groupExecution.weiAmountLeft.minus(order.weiReturn)
+        }
+        //else don't return any wei
+        else{
+          withdrawRequest.weiReturn = BigInt.fromI32(0)
+        }
+
         withdrawRequest.save()
+        order.save()
+        groupExecution.save()
       }
       else{
         //handle error

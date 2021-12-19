@@ -1,7 +1,7 @@
 type GroupOrder @entity {
   id:              ID!
   groupAmount:     BigInt!
-  groupGwei:       BigInt!
+  groupWei:       BigInt!
   fromToken:       Bytes!
   destToken:       Bytes!
   orderTxnHashes:  [Bytes!]!
@@ -17,9 +17,9 @@ type Order @entity {
   fromAmount:      BigInt!
   destAmount:      BigInt!
   returnAmount:    BigInt
-  groupTxnHash:    Bytes
+  groupTxnHash:    Bytes!
   weiAdded:        BigInt!
-  weiReturned:     BigInt
+  weiReturn:       BigInt!
   depstTxnHash:    Bytes!
   depstAmount:     BigInt!
   depstBlock:      BigInt!
@@ -36,6 +36,8 @@ type GroupExecution @entity {
   inputAmount:       BigInt!
   returnAmount:      BigInt!
   returnAmountLeft:  BigInt!
+  weiAmount:         BigInt!
+  weiAmountLeft:     BigInt!
   usedGas:           BigInt!
   compltdTxnHashes: [Bytes!]!
   blockNumber:       BigInt!
@@ -48,6 +50,7 @@ type CancelRequest @entity {
   orderTxnHash:    Bytes!
   withdrawToken:   Bytes! 
   amount:          BigInt!
+  weiReturn:       BigInt!
   block:           BigInt!
   blockIndex:      BigInt!
   trnsfrTxnHash:   Bytes!
@@ -59,6 +62,7 @@ type WithdrawRequest @entity {
   orderTxnHash:    Bytes!
   withdrawToken:   Bytes! 
   amount:          BigInt!
+  weiReturn:       BigInt!
   block:           BigInt!
   blockIndex:      BigInt!
   trnsfrTxnHash:   Bytes!

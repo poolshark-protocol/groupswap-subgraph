@@ -26,7 +26,7 @@ test("Can initialise store with an array of Entity objects", () => {
   )
 
   assert.fieldEquals(GROUPORDER_ENTITY_TYPE, "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e",
-                                            "groupGwei",
+                                            "groupWei",
                                             "0"
   )
 
@@ -81,7 +81,7 @@ test("handleDepositedToGroup - should handle new GroupOrder", () => {
   assert.fieldEquals(
     GROUPORDER_ENTITY_TYPE,
     "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e",
-    "groupGwei",
+    "groupWei",
     "2"
   )
 
@@ -92,7 +92,7 @@ test("handleDepositedToGroup - should handle existing GroupOrder", () => {
 
   let deposit = new GroupOrder("0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e")
   deposit.groupAmount = BigInt.fromI32(2)
-  deposit.groupGwei   = BigInt.fromI32(3)
+  deposit.groupWei   = BigInt.fromI32(3)
   deposit.save()
 
   // Call mappings
@@ -123,7 +123,7 @@ test("handleDepositedToGroup - should handle existing GroupOrder", () => {
   assert.fieldEquals(
     GROUPORDER_ENTITY_TYPE,
     "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e",
-    "groupGwei",
+    "groupWei",
     "5"
   )
  // logStore()
