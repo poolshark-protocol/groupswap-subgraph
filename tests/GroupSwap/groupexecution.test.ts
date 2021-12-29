@@ -11,6 +11,7 @@ import { JSON } from "assemblyscript-json";
 import { handleGroupExecuted, handleWithdrawRequested } from "../../src/mappings/groupswap"
 
 let GROUPEXECUTION_ENTITY_TYPE = "GroupExecution"
+let BOTEXECUTION_ENTITY_TYPE = "BotExecution"
 
 test("handleGroupExecuted - should handle new GroupExecution", () => {
 
@@ -50,18 +51,27 @@ test("handleGroupExecuted - should handle new GroupExecution", () => {
 
   handleNewGroupExecutions([newGroupExecutedEvent])
 
+  logStore()
+
   assert.fieldEquals(
     GROUPEXECUTION_ENTITY_TYPE,
-    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
     "returnAmount",
     "2"
   )
 
   assert.fieldEquals(
     GROUPEXECUTION_ENTITY_TYPE,
-    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
     "compltdTxnHashes",
     '[0xa16081f360e3847006db660bae1c6d1b2e17ec2a]'
+  )
+
+  assert.fieldEquals(
+    BOTEXECUTION_ENTITY_TYPE,
+    "0xa16081f360e3847006db660bae1c6d1b2e17ec2a",
+    "groupIds",
+    '[0xe46f9cbe5d8c6d3c9df0fa21d0d8c906b17c3346d5af27bd6e59913321162a6e]'
   )
 
   clearStore()

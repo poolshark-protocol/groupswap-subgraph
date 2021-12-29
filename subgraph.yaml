@@ -1,4 +1,4 @@
-specVersion: 0.0.3
+specVersion: 0.0.4
 description: PredaDex for Ethereum
 repository: https://github.com/PoolSharks-Protocol/swap-rollups-subgraph
 schema:

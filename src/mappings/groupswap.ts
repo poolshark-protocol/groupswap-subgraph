@@ -1,4 +1,4 @@
-import { BigDecimal, BigInt, ByteArray, Bytes, Address, store } from "@graphprotocol/graph-ts"
+import { BigDecimal, BigInt, ByteArray, Bytes, Address, store, log } from "@graphprotocol/graph-ts"
 import {
   DepositedToGroup,
   GroupExecuted,
@@ -10,7 +10,7 @@ import {
 import { 
  CancelRequest,
  WithdrawRequest,
- GroupOrder, Order, GroupExecution
+ GroupOrder, Order, GroupExecution, BotExecution
 } from "../../generated/schema"
 
 import { JSON } from "assemblyscript-json";
@@ -107,11 +107,31 @@ export function handleGroupExecuted(event: GroupExecuted): void {
   let blockNumber = event.block.number
   let blockIndex  = event.transaction.index
 
-  let groupExecution = GroupExecution.load(txnHash.toHex())
+  let groupExecutionId = groupId.toHex().concat(txnHash.toHex())
+
+  let botExecution = BotExecution.load(txnHash.toHex())
+  let groupExecution = GroupExecution.load(groupExecutionId)
+  let groupIds = new Array<Bytes>();
+
+  if(!botExecution){
+    botExecution = new BotExecution(txnHash.toHex())
+    botExecution.blockIndex = blockIndex
+    botExecution.blockNumber = blockNumber
+    botExecution.groupIds = new Array<Bytes>();
+    botExecution.usedGas = BigInt.fromI32(0)
+  }
+  else{
+    groupIds = botExecution.groupIds
+  }
+
+  groupIds.push(groupId)
+  botExecution.groupIds = groupIds
+  botExecution.usedGas.plus(gasUsed)
+  botExecution.save()
 
   if(!groupExecution){
 
-    let newGroupExecution = new GroupExecution(txnHash.toHex())
+    let newGroupExecution = new GroupExecution(groupExecutionId)
     let groupOrder = GroupOrder.load(groupId.toHex())
 
     if(groupOrder){
@@ -123,9 +143,9 @@ export function handleGroupExecuted(event: GroupExecuted): void {
       for (let i = 0 ; i < groupOrder.orderTxnHashes.length; ++i) {
         // load each txnHash from openOrders
         let openOrder = Order.load(openOrders[i].toHex())
-        if(openOrder && openOrder.status == "open"){
+        if(openOrder && openOrder.status == OPEN_STATUS){
           // exclude txn hashes
-          let excludeTxnHash = (blockNumber == openOrder.depstBlock) && (openOrder.depstIndex < blockIndex)
+          let excludeTxnHash = (blockNumber >= openOrder.depstBlock) && (openOrder.depstIndex < blockIndex)
           
           // check block deposited
           if(!excludeTxnHash){
@@ -141,7 +161,7 @@ export function handleGroupExecuted(event: GroupExecuted): void {
             openOrder.fromAmount   = BigInt.fromI32(0)
             openOrder.destAmount   = BigInt.fromString(destAmountStr)
             openOrder.returnAmount = BigInt.fromString(destAmountStr)
-            openOrder.groupTxnHash = txnHash
+            openOrder.groupExecId  = groupExecutionId
             // TODO: split wei 80/20
             openOrder.weiReturn  = BigInt.fromI32(0)
             openOrder.save()
@@ -158,6 +178,7 @@ export function handleGroupExecuted(event: GroupExecuted): void {
         }
         else{
           //report an error
+          log.error("GroupExecution {} cannot be matched to GroupOrder {} for TxnHash {}", [groupExecutionId, groupId.toHex(), txnHash.toHex()])
         }
       }
 
@@ -180,6 +201,9 @@ export function handleGroupExecuted(event: GroupExecuted): void {
     newGroupExecution.blockNumber = blockNumber
     newGroupExecution.blockIndex = blockIndex
     newGroupExecution.save()
+  }
+  else {
+
   }
 
 }
@@ -262,7 +286,7 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
     }
     else if(order.status == 'executed' && accountMatches) {
       let destTokenMatches = withdrawToken.toHex() == order.destToken.toHex()
-      let groupExecution = GroupExecution.load(order.groupTxnHash.toHex())
+      let groupExecution = GroupExecution.load(order.groupExecId)
       // check token requested matches
       if (destTokenMatches && groupExecution){
 

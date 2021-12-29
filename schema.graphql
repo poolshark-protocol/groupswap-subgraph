@@ -17,7 +17,7 @@ type Order @entity {
   fromAmount:      BigInt!
   destAmount:      BigInt!
   returnAmount:    BigInt
-  groupTxnHash:    Bytes!
+  groupExecId:     String!
   weiAdded:        BigInt!
   weiReturn:       BigInt!
   depstTxnHash:    Bytes!
@@ -30,9 +30,18 @@ type Order @entity {
   wthdrwAmount:    BigInt!
 }
 
+type BotExecution @entity {
+  id:                ID!
+  groupIds:          [Bytes!]!
+  usedGas:           BigInt!
+  blockNumber:       BigInt!
+  blockIndex:        BigInt!
+}
+
 type GroupExecution @entity {
   id:                ID!
   groupId:           Bytes!
+  txnHash:           Bytes!
   inputAmount:       BigInt!
   returnAmount:      BigInt!
   returnAmountLeft:  BigInt!

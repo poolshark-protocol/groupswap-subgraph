@@ -87,7 +87,7 @@ test("handlewithdrawRequested - should handle new CancelRequest", () => {
   
     handleNewWithdrawRequested([newWithdrawRequestedEvent])
   
-    logStore()
+    //logStore()
   
     assert.fieldEquals(
         CANCELREQUEST_ENTITY_TYPE,
@@ -154,7 +154,7 @@ test("handlewithdrawRequested - should handle new partial CancelRequest", () => 
 
   handleNewWithdrawRequested([newWithdrawRequestedEvent])
 
-  logStore()
+  //logStore()
 
   assert.fieldEquals(
       CANCELREQUEST_ENTITY_TYPE,

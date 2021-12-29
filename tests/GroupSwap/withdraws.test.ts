@@ -94,7 +94,7 @@ test("handleWithdrawRequested - should handle new WithdrawRequest", () => {
 
   handleNewWithdrawRequested([newWithdrawRequestedEvent])
 
-  //logStore()
+  logStore()
 
   assert.fieldEquals(
     WITHDRAWREQUEST_ENTITY_TYPE,
