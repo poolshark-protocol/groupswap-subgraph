@@ -15,10 +15,18 @@ import {
 
 import { JSON } from "assemblyscript-json";
 
-const OPEN_STATUS             = "open"
-const CANCELLED_STATUS        = "cancelled"
-const EXECUTED_STATUS         = "executed"
-const COMPLETED_STATUS        = "completed"
+// order statuses
+const OrderStatus  = new Map<string,string>()
+OrderStatus.set("OPEN", "open")
+OrderStatus.set("CANCELLED", "cancelled")
+OrderStatus.set("EXECUTED", "executed")
+OrderStatus.set("COMPLETED", "completed")
+
+// withdraw statuses
+const WithdrawStatus = new Map<string, string>()
+WithdrawStatus.set("PENDING", "pending")
+WithdrawStatus.set("COMPLETED", "completed")
+WithdrawStatus.set("DENIED", "denied")
 
 export function handleDepositedToGroup(event: DepositedToGroup): void {
   // Entities can be loaded from the store using a string ID; this ID
@@ -75,7 +83,7 @@ export function handleDepositedToGroup(event: DepositedToGroup): void {
   // OrderData
   let orderEntity = new Order(txnHash.toHex())
   orderEntity.account         = account
-  orderEntity.status          = OPEN_STATUS
+  orderEntity.status          = OrderStatus.get("OPEN")
   orderEntity.groupId         = groupId
   orderEntity.fromToken       = fromToken
   orderEntity.destToken       = destToken
@@ -107,10 +115,10 @@ export function handleGroupExecuted(event: GroupExecuted): void {
   let blockNumber = event.block.number
   let blockIndex  = event.transaction.index
 
-  let groupExecutionId = groupId.toHex().concat(txnHash.toHex())
+  let groupExecId = groupId.toHex().concat(txnHash.toHex())
 
   let botExecution = BotExecution.load(txnHash.toHex())
-  let groupExecution = GroupExecution.load(groupExecutionId)
+  let groupExecution = GroupExecution.load(groupExecId)
   let groupIds = new Array<Bytes>();
 
   if(!botExecution){
@@ -131,7 +139,7 @@ export function handleGroupExecuted(event: GroupExecuted): void {
 
   if(!groupExecution){
 
-    let newGroupExecution = new GroupExecution(groupExecutionId)
+    let newGroupExecution = new GroupExecution(groupExecId)
     let groupOrder = GroupOrder.load(groupId.toHex())
 
     if(groupOrder){
@@ -143,7 +151,7 @@ export function handleGroupExecuted(event: GroupExecuted): void {
       for (let i = 0 ; i < groupOrder.orderTxnHashes.length; ++i) {
         // load each txnHash from openOrders
         let openOrder = Order.load(openOrders[i].toHex())
-        if(openOrder && openOrder.status == OPEN_STATUS){
+        if(openOrder && openOrder.status == OrderStatus.get("OPEN")){
           // exclude txn hashes
           let excludeTxnHash = (blockNumber >= openOrder.depstBlock) && (openOrder.depstIndex < blockIndex)
           
@@ -157,11 +165,11 @@ export function handleGroupExecuted(event: GroupExecuted): void {
             let destAmountStr      = returnAmount.toBigDecimal().times(orderGroupRatio).toString().split('.')[0]
           
             // save entity
-            openOrder.status       = EXECUTED_STATUS
+            openOrder.status       = OrderStatus.get("EXECUTED")
             openOrder.fromAmount   = BigInt.fromI32(0)
             openOrder.destAmount   = BigInt.fromString(destAmountStr)
             openOrder.returnAmount = BigInt.fromString(destAmountStr)
-            openOrder.groupExecId  = groupExecutionId
+            openOrder.groupExecId  = groupExecId
             // TODO: split wei 80/20
             openOrder.weiReturn  = BigInt.fromI32(0)
             openOrder.save()
@@ -169,16 +177,39 @@ export function handleGroupExecuted(event: GroupExecuted): void {
             // add to list of completedOrders for GroupExecution
             compltdTxnHashes.push(openOrders[i])
           }
-          else if (excludeTxnHash) {
+          else{
             newOpenOrders.push(openOrders[i])
           }
-          else {
-            //report some error
+        }
+        else if (openOrder){
+          if (openOrder.status != OrderStatus.get("OPEN")){
+            log.error("GroupExecution: id: {} || txnHash: {} || block: {} || index {} found order with incorrect status -> Order id: {} || status: {} || block: {} || index: {}",
+                [
+                  groupExecId,
+                  txnHash.toHex(),
+                  blockNumber.toString(),
+                  blockIndex.toString(),
+                  openOrder.id,
+                  openOrder.status,
+                  openOrder.depstBlock.toString(),
+                  openOrder.depstIndex.toString()
+                ]
+            )
           }
         }
         else{
-          //report an error
-          log.error("GroupExecution {} cannot be matched to GroupOrder {} for TxnHash {}", [groupExecutionId, groupId.toHex(), txnHash.toHex()])
+          if (!openOrder){
+          log.error("GroupExecution: id: {} || txnHash: {} || block: {} || index: {} couldn't load Order: id {}",
+              [
+                groupExecId,
+                txnHash.toHex(),
+                blockNumber.toString(),
+                blockIndex.toString(),
+                openOrders[i].toHex()
+              ]
+            )
+          }
+          
         }
       }
 
@@ -203,7 +234,9 @@ export function handleGroupExecuted(event: GroupExecuted): void {
     newGroupExecution.save()
   }
   else {
-
+    log.error("GroupExecution already exists for TxnHash {} and GroupId {}",
+                    [txnHash.toHex(),groupId.toHex()]
+             )
   }
 
 }
@@ -230,7 +263,33 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
   if(order){
     let originAccount = order.account
     let accountMatches = originAccount.toHex() == account.toHex()
-    if (order.status == 'open' && accountMatches) {
+    if (order.status == 'open') {
+
+      let cancelRequest = CancelRequest.load(txnHash.toHex())
+
+      if(cancelRequest){
+        log.error("CancelRequest: already exists for TxnHash {}",
+                  [txnHash.toHex()]
+            )
+        return
+      }
+      
+      cancelRequest = new CancelRequest(txnHash.toHex())
+      cancelRequest.account = account
+      cancelRequest.orderTxnHash = order.depstTxnHash
+      cancelRequest.withdrawToken = order.fromToken
+      cancelRequest.amount = amountParam
+      cancelRequest.block = blockNumber
+      cancelRequest.blockIndex = blockIndex
+      cancelRequest.message = ""
+      
+      if(!accountMatches){
+        cancelRequest.status  = WithdrawStatus.get("DENIED")
+        cancelRequest.message = "Request Denied: Withdraw and Order users don't match!"
+        cancelRequest.save()
+        return
+      }
+
       let groupOrder = GroupOrder.load(order.groupId.toHex())  
       let fromTokenMatches = withdrawToken.toHex() == order.fromToken.toHex()
       if(fromTokenMatches && groupOrder){
@@ -240,7 +299,7 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
         //check if user is trying to withdraw all
         if(amountParam >= amountLeft){
           wthdrwAmount = amountLeft
-          order.status = CANCELLED_STATUS
+          order.status = OrderStatus.get("CANCELLED")
           order.fromAmount = BigInt.fromI32(0)
           order.canclAmount = order.canclAmount.plus(amountLeft)
         }
@@ -249,22 +308,12 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
           order.fromAmount = order.fromAmount.minus(amountParam)
           order.wthdrwAmount = order.canclAmount.plus(amountParam)
         }
-        
         groupOrder.groupAmount = groupOrder.groupAmount.minus(wthdrwAmount)
-        
 
         let newCanclTxnHashes = order.canclTxnHashes
         newCanclTxnHashes.push(txnHash)
         order.canclTxnHashes = newCanclTxnHashes
-
-        let cancelRequest = new CancelRequest(txnHash.toHex())
-        cancelRequest.account = account
-        cancelRequest.orderTxnHash = order.depstTxnHash
-        cancelRequest.withdrawToken = order.fromToken
-        cancelRequest.amount = amountParam
-        cancelRequest.block = blockNumber
-        cancelRequest.blockIndex = blockIndex
-
+        
         //if no wei has been returned and the user has fully cancelled
         if(order.weiReturn == BigInt.fromI32(0) && order.fromAmount.equals(BigInt.fromI32(0))){
           cancelRequest.weiReturn = order.weiAdded
@@ -281,21 +330,48 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
         groupOrder.save()       
       }
       else{
-        //handle error
+        if(!fromTokenMatches){
+          log.error("CancelRequest: withdrawToken {} doesn't match for CancelTxnHash {} and GroupId {} with From token {}",
+            [
+              withdrawToken.toString(),
+              txnHash.toHex(),
+              order.id,
+              order.fromToken.toString()
+            ]
+          )
+        }
+        if(!groupOrder){
+          log.error("CancelRequest: GroupOrder not found for withdrawToken {} with CancelTxnHash {} with Order id {} and fromToken {}",
+            [
+              withdrawToken.toString(),
+              txnHash.toHex(),
+              order.id,
+              order.fromToken.toString()
+            ]
+         )
+        }
       }
     }
-    else if(order.status == 'executed' && accountMatches) {
+    else if(order.status == 'executed') {
       let destTokenMatches = withdrawToken.toHex() == order.destToken.toHex()
       let groupExecution = GroupExecution.load(order.groupExecId)
       // check token requested matches
       if (destTokenMatches && groupExecution){
 
-        let amountLeft = order.destAmount
+        let withdrawRequest = WithdrawRequest.load(txnHash.toHex())
 
+        if(withdrawRequest){
+          log.error("WithdrawRequest: already exists for TxnHash {}",
+                    [txnHash.toHex()]
+             )
+          return
+        }
+
+        let amountLeft = order.destAmount
         //check if user is trying to withdraw all
         if(amountParam >= amountLeft){
           wthdrwAmount = amountLeft
-          order.status = COMPLETED_STATUS
+          order.status = OrderStatus.get("COMPLETED")
           order.destAmount = BigInt.fromI32(0)
           order.wthdrwAmount = order.wthdrwAmount.plus(amountLeft)
         }
@@ -306,18 +382,26 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
           order.wthdrwAmount = order.wthdrwAmount.plus(amountParam)
         }
 
-        let newWthdrwTxnHashes = order.wthdrwTxnHashes
-        newWthdrwTxnHashes.push(txnHash)
-        order.wthdrwTxnHashes = newWthdrwTxnHashes
-        
-        let withdrawRequest = new WithdrawRequest(txnHash.toHex())
+        withdrawRequest = new WithdrawRequest(txnHash.toHex())
         withdrawRequest.account = account
         withdrawRequest.orderTxnHash = order.depstTxnHash
         withdrawRequest.withdrawToken = order.destToken
         withdrawRequest.amount = wthdrwAmount
         withdrawRequest.block = blockNumber
         withdrawRequest.blockIndex = blockIndex
+        withdrawRequest.status = WithdrawStatus.get("PENDING")
+        
+        if(!accountMatches){
+          withdrawRequest.status  = WithdrawStatus.get("DENIED")
+          withdrawRequest.message = "Request Denied: Withdraw and Order users don't match!"
+          withdrawRequest.save()
+          return
+        }
 
+        let newWthdrwTxnHashes = order.wthdrwTxnHashes
+        newWthdrwTxnHashes.push(txnHash)
+        order.wthdrwTxnHashes = newWthdrwTxnHashes
+        
         //if no wei has been returned and the user has fully withdrawn
         if(order.weiReturn == BigInt.fromI32(0) && order.fromAmount.equals(BigInt.fromI32(0))){
           //note: order.weiReturn is updated in GroupExecuted handler 
@@ -334,11 +418,45 @@ export function handleWithdrawRequested(event: WithdrawRequested): void {
         groupExecution.save()
       }
       else{
-        //handle error
+          if(!destTokenMatches){
+            log.error("WithdrawRequest: withdrawToken {} doesn't match for WithdrawTxnHash {} and GroupId {} with destToken {}",
+                      [
+                        withdrawToken.toString(),
+                        txnHash.toHex(),
+                        order.id,
+                        order.destToken.toString()
+                      ]
+                     )
+          }
+          if(!groupExecution){
+            log.error("WithdrawRequest: GroupOrder not found for withdrawToken {} with WithdrawTxnHash {} with Order id {} and destToken {}",
+            [
+              withdrawToken.toString(),
+              txnHash.toHex(),
+              order.id,
+              order.destToken.toString()
+            ]
+           )
+          }
       }
     }
     else{
-      //handle error
+      if(!accountMatches){
+        log.error("WithdrawRequest: withdrawToken {} doesn't match for WithdrawTxnHash {} and GroupId {} with destToken {}",
+                      [
+                        withdrawToken.toString(),
+                        txnHash.toHex(),
+                        order.id,
+                        order.destToken.toString()
+                      ]
+                  )
+      }
+      if(order.status == OrderStatus.get("CANCELLED")){
+        
+      }
+      if(order.status == OrderStatus.get("COMPLETED")){
+
+      }
     }
 
   }

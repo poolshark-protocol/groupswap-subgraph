@@ -56,6 +56,8 @@ type GroupExecution @entity {
 type CancelRequest @entity {
   id:              ID!
   account:         Bytes!
+  status:          String!
+  message:         String!
   orderTxnHash:    Bytes!
   withdrawToken:   Bytes! 
   amount:          BigInt!
@@ -68,6 +70,8 @@ type CancelRequest @entity {
 type WithdrawRequest @entity {
   id:              ID!
   account:         Bytes!
+  status:          String!
+  message:         String!
   orderTxnHash:    Bytes!
   withdrawToken:   Bytes! 
   amount:          BigInt!
